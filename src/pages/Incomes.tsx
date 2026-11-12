@@ -10,6 +10,7 @@ import { deleteIncome } from '../api/services/income.service';
 import { useToast } from '../hooks/useToast';
 import { formatMoney } from '../utils';
 import { CardSkeleton } from '../components/CardSkeleton';
+import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { useDate } from '../hooks/useDate';
 import { incomesByMonthQuery } from '../queries/incomes';
 import { queryClient } from '../Routes';
@@ -128,9 +129,13 @@ export default function Main() {
                         <span className="text-3xl font-[600]">
                             Entradas
                         </span>
-                        <span className="text-sm/6 text-neutral-600">
-                            {`${incomes?.length} fonte(s) de entrada · ${formatMoney(String(incomesTotal))} esse mês`}
-                        </span>
+                        {query.isPending ?
+                            <LoadingSkeleton className="h-4 w-64 rounded-lg my-1" />
+                            :
+                            <span className="text-sm/6 text-neutral-600">
+                                {`${incomes?.length} fonte(s) de entrada · ${formatMoney(String(incomesTotal))} esse mês`}
+                            </span>
+                        }
                     </div>
 
                     <div className="w-max">
@@ -149,42 +154,60 @@ export default function Main() {
                     className="grid grid-cols-6 gap-6 w-full"
                 >
 
-                    {incomes?.length ?
-                        incomes.map((income, index) =>
-                            <div key={`income-div-${index}`} className="col-span-2">
+                    {query.isPending ?
+                        [0, 1, 2].map(index =>
+                            <div key={`income-skeleton-${index}`} className="col-span-2">
                                 <CardSkeleton>
                                     <div className="flex justify-between items-center">
-                                        <div className="bg-green-100 size-10 rounded-full flex justify-center items-center">
-                                            <TrendingUp size={20} className="text-green-900" />
-                                        </div>
-
-                                        {/* {renderBadge(Number(data.expensesTotal[3]._sum.amount), Number(data.expensesTotal[2]._sum.amount), true)} */}
-
-                                        <MoreOptionButton onClick={(e) => handleMoreOptionsButton(e, income)} />
+                                        <LoadingSkeleton className="size-10 rounded-full" />
+                                        <LoadingSkeleton className="size-8 rounded-full" />
                                     </div>
 
                                     <div className="flex flex-col justify-between items-start mt-4 mb-4">
-                                        <span className="text-md font-[600]">{income.title}</span>
+                                        <LoadingSkeleton className="h-5 w-32 rounded-lg" />
                                     </div>
 
-                                    <span className="text-green-600 font-[600] text-2xl">+{formatMoney(String(Number(income.amount).toFixed(2)))}</span>
+                                    <LoadingSkeleton className="h-8 w-40 rounded-lg" />
                                 </CardSkeleton>
                             </div>
                         )
                         :
-                        <div className="col-span-6">
-                            <CardSkeleton>
-                                <div className="flex flex-col gap-4 justify-center items-center py-12">
-                                    <div className="flex items-center justify-center size-16 bg-neutral-100/60 rounded-full text-neutral-500">
-                                        <TrendingUp size={24} />
-                                    </div>
+                        incomes?.length ?
+                            incomes.map((income, index) =>
+                                <div key={`income-div-${index}`} className="col-span-2">
+                                    <CardSkeleton>
+                                        <div className="flex justify-between items-center">
+                                            <div className="bg-green-100 size-10 rounded-full flex justify-center items-center">
+                                                <TrendingUp size={20} className="text-green-900" />
+                                            </div>
 
-                                    <span className="text-lg font-[600]">{`Nenhum registro em ${currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}`}</span>
+                                            {/* {renderBadge(Number(data.expensesTotal[3]._sum.amount), Number(data.expensesTotal[2]._sum.amount), true)} */}
 
-                                    <span className="text-sm text-center w-2/5">Nenhum entrada foi encontrada no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova entrada para este mês.</span>
+                                            <MoreOptionButton onClick={(e) => handleMoreOptionsButton(e, income)} />
+                                        </div>
+
+                                        <div className="flex flex-col justify-between items-start mt-4 mb-4">
+                                            <span className="text-md font-[600]">{income.title}</span>
+                                        </div>
+
+                                        <span className="text-green-600 font-[600] text-2xl">+{formatMoney(String(Number(income.amount).toFixed(2)))}</span>
+                                    </CardSkeleton>
                                 </div>
-                            </CardSkeleton>
-                        </div>
+                            )
+                            :
+                            <div className="col-span-6">
+                                <CardSkeleton>
+                                    <div className="flex flex-col gap-4 justify-center items-center py-12">
+                                        <div className="flex items-center justify-center size-16 bg-neutral-100/60 rounded-full text-neutral-500">
+                                            <TrendingUp size={24} />
+                                        </div>
+
+                                        <span className="text-lg font-[600]">{`Nenhum registro em ${currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}`}</span>
+
+                                        <span className="text-sm text-center w-2/5">Nenhum entrada foi encontrada no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova entrada para este mês.</span>
+                                    </div>
+                                </CardSkeleton>
+                            </div>
                     }
                 </div>
             </div>

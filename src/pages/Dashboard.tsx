@@ -1,4 +1,5 @@
 import { CardSkeleton } from '../components/CardSkeleton';
+import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { ExpensesVsIncomesBarChart } from '../components/charts/BarChart';
 import type { Expense, ExpenseSummarized } from '../api/types/expense';
 import { formatMoney, getMonthOffset, PAYMENT_METHOD_MAP, PAYMENT_METHOD_TO_COLOR_MAP } from '../utils';
@@ -78,6 +79,93 @@ function getIncomesVsExpensesBarChartData(startDate: Date, expensesTotal: number
     return data;
 }
 
+function DashboardSkeleton() {
+    return (
+        <>
+            {[0, 1, 2].map(index => (
+                <div key={`dashboard-card-skeleton-${index}`} className="col-span-2">
+                    <CardSkeleton>
+                        <div className="flex justify-between items-center">
+                            <LoadingSkeleton className="size-10 rounded-full" />
+                            <LoadingSkeleton className="h-6 w-16 rounded-full" />
+                        </div>
+
+                        <div className="flex flex-col gap-2 mt-6">
+                            <LoadingSkeleton className="h-3 w-28 rounded-lg" />
+                            <LoadingSkeleton className="h-8 w-40 rounded-lg" />
+                        </div>
+                    </CardSkeleton>
+                </div>
+            ))}
+
+            <div className="col-span-4">
+                <CardSkeleton>
+                    <div className="flex flex-col gap-2 mb-4">
+                        <LoadingSkeleton className="h-5 w-48 rounded-lg" />
+                        <LoadingSkeleton className="h-3 w-36 rounded-lg" />
+                    </div>
+                    <LoadingSkeleton className="h-60 w-full rounded-xl" />
+                </CardSkeleton>
+            </div>
+
+            <div className="col-span-2">
+                <CardSkeleton>
+                    <div className="flex flex-col gap-2 mb-4">
+                        <LoadingSkeleton className="h-5 w-40 rounded-lg" />
+                        <LoadingSkeleton className="h-3 w-28 rounded-lg" />
+                    </div>
+                    <LoadingSkeleton className="size-40 rounded-full mx-auto mb-4" />
+                    <div className="flex flex-col gap-2">
+                        {[0, 1, 2].map(index => (
+                            <LoadingSkeleton key={`dashboard-pie-line-${index}`} className="h-3 w-full rounded-lg" />
+                        ))}
+                    </div>
+                </CardSkeleton>
+            </div>
+
+            <div className="col-span-4">
+                <CardSkeleton padding={{ left: 0, right: 0 }}>
+                    <div className="flex flex-col gap-2 px-6 mb-3">
+                        <LoadingSkeleton className="h-5 w-40 rounded-lg" />
+                        <LoadingSkeleton className="h-3 w-56 rounded-lg" />
+                    </div>
+
+                    {[0, 1, 2, 3, 4, 5].map(index => (
+                        <div
+                            key={`dashboard-table-skeleton-${index}`}
+                            className="flex justify-between items-center py-3 px-6 border-b-1 border-slate-200 last:border-0"
+                        >
+                            <div className="flex gap-2 items-center">
+                                <LoadingSkeleton className="size-10 rounded-full" />
+                                <div className="flex flex-col gap-2">
+                                    <LoadingSkeleton className="h-4 w-32 rounded-lg" />
+                                    <LoadingSkeleton className="h-3 w-48 rounded-lg" />
+                                </div>
+                            </div>
+                            <LoadingSkeleton className="h-4 w-20 rounded-lg" />
+                        </div>
+                    ))}
+                </CardSkeleton>
+            </div>
+
+            <div className="col-span-2">
+                <CardSkeleton>
+                    <div className="flex flex-col gap-2 mb-4">
+                        <LoadingSkeleton className="h-5 w-48 rounded-lg" />
+                        <LoadingSkeleton className="h-3 w-28 rounded-lg" />
+                    </div>
+                    <LoadingSkeleton className="size-40 rounded-full mx-auto mb-4" />
+                    <div className="flex flex-col gap-2">
+                        {[0, 1, 2].map(index => (
+                            <LoadingSkeleton key={`dashboard-pie2-line-${index}`} className="h-3 w-full rounded-lg" />
+                        ))}
+                    </div>
+                </CardSkeleton>
+            </div>
+        </>
+    );
+}
+
 export default function Main() {
     const authContext = useAuth();
 
@@ -102,6 +190,11 @@ export default function Main() {
             incomesByMonthQuery(getMonthOffset(currentDate, 2))
         ]
     });
+
+    const isLoading =
+        expensesSummarizedQuery.isPending ||
+        expensesQueries.some(query => query.isPending) ||
+        incomesQueries.some(query => query.isPending);
 
     const data = {
         incomes: incomesQueries[2].data,
@@ -202,133 +295,136 @@ export default function Main() {
                 className="grid grid-cols-6 gap-6 w-full"
             >
                 {
-                    data.incomes?.length || data.expenses?.length ?
-                        <>
-                            <div className="col-span-2">
-                                <CardSkeleton>
-                                    <div className="flex justify-between items-center">
-                                        <div className="bg-green-100 size-10 rounded-full flex justify-center items-center">
-                                            <TrendingUp size={20} className="text-green-900" />
+                    isLoading ?
+                        <DashboardSkeleton />
+                        :
+                        data.incomes?.length || data.expenses?.length ?
+                            <>
+                                <div className="col-span-2">
+                                    <CardSkeleton>
+                                        <div className="flex justify-between items-center">
+                                            <div className="bg-green-100 size-10 rounded-full flex justify-center items-center">
+                                                <TrendingUp size={20} className="text-green-900" />
+                                            </div>
+
+                                            {renderBadge(data.incomesTotal[1], data.incomesTotal[2])}
                                         </div>
 
-                                        {renderBadge(data.incomesTotal[1], data.incomesTotal[2])}
-                                    </div>
+                                        <div className="flex flex-col justify-between items-start mt-6">
+                                            <span className="text-xs font-[300]">Entradas somadas</span>
+                                            <span className="text-3xl font-[600]">{formatMoney(String(incomeTotal.toFixed(2)))}</span>
+                                        </div>
+                                    </CardSkeleton>
+                                </div>
 
-                                    <div className="flex flex-col justify-between items-start mt-6">
-                                        <span className="text-xs font-[300]">Entradas somadas</span>
-                                        <span className="text-3xl font-[600]">{formatMoney(String(incomeTotal.toFixed(2)))}</span>
-                                    </div>
-                                </CardSkeleton>
-                            </div>
+                                <div className="col-span-2">
+                                    <CardSkeleton>
+                                        <div className="flex justify-between items-center">
+                                            <div className="bg-red-100 size-10 rounded-full flex justify-center items-center">
+                                                <TrendingDown size={20} className="text-red-900" />
+                                            </div>
 
-                            <div className="col-span-2">
-                                <CardSkeleton>
-                                    <div className="flex justify-between items-center">
-                                        <div className="bg-red-100 size-10 rounded-full flex justify-center items-center">
-                                            <TrendingDown size={20} className="text-red-900" />
+                                            {renderBadge(data.expensesTotal[1], data.expensesTotal[2], true)}
                                         </div>
 
-                                        {renderBadge(data.expensesTotal[1], data.expensesTotal[2], true)}
-                                    </div>
+                                        <div className="flex flex-col justify-between items-start mt-6">
+                                            <span className="text-xs font-[300]">Despesas somadas</span>
+                                            <span className="text-3xl font-[600]">{formatMoney(String(expenseTotal.toFixed(2)))}</span>
+                                        </div>
+                                    </CardSkeleton>
+                                </div>
 
-                                    <div className="flex flex-col justify-between items-start mt-6">
-                                        <span className="text-xs font-[300]">Despesas somadas</span>
-                                        <span className="text-3xl font-[600]">{formatMoney(String(expenseTotal.toFixed(2)))}</span>
-                                    </div>
-                                </CardSkeleton>
-                            </div>
+                                <div className="col-span-2">
+                                    <CardSkeleton>
+                                        <div className="flex justify-between items-center">
+                                            <div className="bg-teal-100 size-10 rounded-full flex justify-center items-center">
+                                                <Wallet size={20} className="text-teal-900" />
+                                            </div>
 
-                            <div className="col-span-2">
-                                <CardSkeleton>
-                                    <div className="flex justify-between items-center">
-                                        <div className="bg-teal-100 size-10 rounded-full flex justify-center items-center">
-                                            <Wallet size={20} className="text-teal-900" />
+                                            {renderBadge(
+                                                data.incomesTotal[1] - data.expensesTotal[1],
+                                                data.incomesTotal[2] - data.expensesTotal[2]
+                                            )}
                                         </div>
 
-                                        {renderBadge(
-                                            data.incomesTotal[1] - data.expensesTotal[1],
-                                            data.incomesTotal[2] - data.expensesTotal[2]
-                                        )}
-                                    </div>
+                                        <div className="flex flex-col justify-between items-start mt-6">
+                                            <span className="text-xs font-[300]">Balanço mensal</span>
+                                            <span className="text-3xl font-[600]">{getBalance(incomeTotal, expenseTotal)}</span>
+                                        </div>
+                                    </CardSkeleton>
+                                </div>
 
-                                    <div className="flex flex-col justify-between items-start mt-6">
-                                        <span className="text-xs font-[300]">Balanço mensal</span>
-                                        <span className="text-3xl font-[600]">{getBalance(incomeTotal, expenseTotal)}</span>
-                                    </div>
-                                </CardSkeleton>
-                            </div>
-
-                            <div className="col-span-4">
-                                <CardSkeleton>
-                                    <ExpensesVsIncomesBarChart
-                                        data={incomesVsExpensesBarChartData}
-                                        legend={{
-                                            title: "Entradas vs Despesas",
-                                            description: `De ${incomesVsExpensesBarChartData[0].name} a ${incomesVsExpensesBarChartData[incomesVsExpensesBarChartData.length - 1].name}`,
-                                            showChartLegend: true
-                                        }}
-                                        aspectRatio={2.5}
-                                        barGap={8}
-                                    />
-                                </CardSkeleton>
-                            </div>
-
-                            <div className="col-span-2">
-                                <CardSkeleton>
-                                    <CustomPieChart
-                                        data={expensesByCategoryPieData}
-                                        caption={{
-                                            title: "Despesas por categoria",
-                                            description: `Mês de ${currentDate.toLocaleDateString("pt-BR", { month: "long" })}`,
-                                            maxItems: 4
-                                        }}
-                                    />
-                                </CardSkeleton>
-                            </div>
-
-                            <div className="col-span-4">
-                                <CardSkeleton padding={{ left: 0, right: 0 }}>
-                                    {tableData ? 
-                                        <BasicTable
-                                            caption={{ title: "Últimas transações", description: "Atividades recentes em sua(s) conta(s)" }}
-                                            data={tableData}
+                                <div className="col-span-4">
+                                    <CardSkeleton>
+                                        <ExpensesVsIncomesBarChart
+                                            data={incomesVsExpensesBarChartData}
+                                            legend={{
+                                                title: "Entradas vs Despesas",
+                                                description: `De ${incomesVsExpensesBarChartData[0].name} a ${incomesVsExpensesBarChartData[incomesVsExpensesBarChartData.length - 1].name}`,
+                                                showChartLegend: true
+                                            }}
+                                            aspectRatio={2.5}
+                                            barGap={8}
                                         />
-                                    : null
-                                    }
-                                </CardSkeleton>
-                            </div>
+                                    </CardSkeleton>
+                                </div>
 
-                            <div className="col-span-2">
-                                <CardSkeleton>
-                                    {expensesByPaymentMethod ? 
+                                <div className="col-span-2">
+                                    <CardSkeleton>
                                         <CustomPieChart
-                                            data={expensesByPaymentMethod}
+                                            data={expensesByCategoryPieData}
                                             caption={{
-                                                title: "Despesas por forma de pagamento",
+                                                title: "Despesas por categoria",
                                                 description: `Mês de ${currentDate.toLocaleDateString("pt-BR", { month: "long" })}`,
-                                                maxItems: 5
+                                                maxItems: 4
                                             }}
                                         />
-                                    : null
-                                    }
+                                    </CardSkeleton>
+                                </div>
+
+                                <div className="col-span-4">
+                                    <CardSkeleton padding={{ left: 0, right: 0 }}>
+                                        {tableData ?
+                                            <BasicTable
+                                                caption={{ title: "Últimas transações", description: "Atividades recentes em sua(s) conta(s)" }}
+                                                data={tableData}
+                                            />
+                                            : null
+                                        }
+                                    </CardSkeleton>
+                                </div>
+
+                                <div className="col-span-2">
+                                    <CardSkeleton>
+                                        {expensesByPaymentMethod ?
+                                            <CustomPieChart
+                                                data={expensesByPaymentMethod}
+                                                caption={{
+                                                    title: "Despesas por forma de pagamento",
+                                                    description: `Mês de ${currentDate.toLocaleDateString("pt-BR", { month: "long" })}`,
+                                                    maxItems: 5
+                                                }}
+                                            />
+                                            : null
+                                        }
+                                    </CardSkeleton>
+                                </div>
+                            </>
+                            :
+
+                            <div className="col-span-6">
+                                <CardSkeleton>
+                                    <div className="flex flex-col gap-4 justify-center items-center py-12">
+                                        <div className="flex items-center justify-center size-16 bg-neutral-100/60 rounded-full text-neutral-500">
+                                            <CalendarOff size={24} />
+                                        </div>
+
+                                        <span className="text-lg font-[600]">{`Nenhum registro em ${currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}`}</span>
+
+                                        <span className="text-sm text-center w-2/5">Nenhum entrada ou despesa foram encontradas no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova entrada para começar a mapear.</span>
+                                    </div>
                                 </CardSkeleton>
                             </div>
-                        </>
-                        :
-
-                        <div className="col-span-6">
-                            <CardSkeleton>
-                                <div className="flex flex-col gap-4 justify-center items-center py-12">
-                                    <div className="flex items-center justify-center size-16 bg-neutral-100/60 rounded-full text-neutral-500">
-                                        <CalendarOff size={24} />
-                                    </div>
-
-                                    <span className="text-lg font-[600]">{`Nenhum registro em ${currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}`}</span>
-
-                                    <span className="text-sm text-center w-2/5">Nenhum entrada ou despesa foram encontradas no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova entrada para começar a mapear.</span>
-                                </div>
-                            </CardSkeleton>
-                        </div>
                 }
             </div>
         </div>

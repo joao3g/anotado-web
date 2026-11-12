@@ -9,12 +9,49 @@ import { AddOrEditExpenseModal } from '../components/modals/AddOrEditExpenseModa
 import { deleteExpense } from '../api/services/expense.service';
 import { formatMoney, PAYMENT_METHOD_MAP } from '../utils';
 import { CardSkeleton } from '../components/CardSkeleton';
+import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { Badge } from '../components/Badge';
 import { ExpensesTable } from '../components/Table';
 import { useDate } from '../hooks/useDate';
 import { useQuery } from '@tanstack/react-query';
 import { expensesByMonthQuery } from '../queries/expenses';
 import { queryClient } from '../Routes';
+
+// Same layout as the real table: search bar + badges, then rows with the same columns
+function ExpensesTableSkeleton() {
+    return (
+        <CardSkeleton padding={{ left: 0, right: 0 }}>
+            <div className="flex items-center border-b-1 border-slate-200 pl-6 pb-4 gap-2">
+                <LoadingSkeleton className="h-9 w-80 rounded-full" />
+                <LoadingSkeleton className="h-6 w-20 rounded-full" />
+                <LoadingSkeleton className="h-6 w-14 rounded-full" />
+                <LoadingSkeleton className="h-6 w-32 rounded-full" />
+            </div>
+
+            <div className="flex flex-col">
+                {[0, 1, 2, 3, 4, 5].map(index => (
+                    <div
+                        key={`expenses-skeleton-row-${index}`}
+                        className="flex justify-between items-center py-3 px-6 gap-6 border-b-1 border-slate-200 last:border-0"
+                    >
+                        <div className="flex flex-col gap-2 flex-2">
+                            <LoadingSkeleton className="h-5 w-40 rounded-lg" />
+                            <LoadingSkeleton className="h-3 w-24 rounded-lg" />
+                        </div>
+
+                        {[0, 1, 2, 3, 4].map(column => (
+                            <div key={`expenses-skeleton-col-${index}-${column}`} className="flex-1">
+                                <LoadingSkeleton className="h-4 w-20 rounded-lg" />
+                            </div>
+                        ))}
+
+                        <div className="size-8" />
+                    </div>
+                ))}
+            </div>
+        </CardSkeleton>
+    );
+}
 
 export default function Main() {
     const { addToast } = useToast();
@@ -108,9 +145,13 @@ export default function Main() {
                         <span className="text-3xl font-[600]">
                             Despesas
                         </span>
-                        <span className="text-sm/6 text-neutral-600">
-                            {`${query.data?.length} transações esse mês · ${formatMoney(String(expensesTotal))}`}
-                        </span>
+                        {query.isPending ?
+                            <LoadingSkeleton className="h-4 w-56 rounded-lg my-1" />
+                            :
+                            <span className="text-sm/6 text-neutral-600">
+                                {`${query.data?.length} transações esse mês · ${formatMoney(String(expensesTotal))}`}
+                            </span>
+                        }
                     </div>
 
                     <div className="w-max">
@@ -127,66 +168,71 @@ export default function Main() {
                 </div>
 
                 {
-                    query.data?.length ?
+                    query.isPending ?
                         <div className="w-full">
-                            <CardSkeleton padding={{ left: 0, right: 0 }}>
-                                <div className="flex items-center border-b-1 border-slate-200 pl-6 pb-4 gap-2">
-                                    <div className="w-80">
-                                        <SearchInput
-                                            placeholder="Buscar por despesas..."
-                                            onChange={(e) => setSearch(e.target.value)}
-                                            onKeyDown={(e) => e.key === "Enter" ? handleSearch() : null}
-                                        />
-                                    </div>
-
-                                    <Badge variant="default">
-                                        <span className="font-bold">
-                                            {currentDate.toLocaleDateString("pt-BR", { month: "long" })[0].toUpperCase() + currentDate.toLocaleDateString("pt-BR", { month: "long" }).slice(1)}
-                                        </span>
-                                    </Badge>
-
-                                    <Badge variant="default">
-                                        <span className="font-bold">
-                                            {currentDate.toLocaleDateString("pt-BR", { year: "numeric" })}
-                                        </span>
-                                    </Badge>
-
-                                    <Badge variant="default">
-                                        <span className="font-bold">
-                                            Todas as categorias
-                                        </span>
-                                    </Badge>
-                                </div>
-
-                                <div>
-                                    <ExpensesTable
-                                        data={tableData}
-                                        onEditClick={(expense) => {
-                                            setSelectedExpense(expense);
-                                            setAddModalOpen(true);
-                                        }}
-                                        onDeleteClick={(expense) => {
-                                            setSelectedExpense(expense);
-                                            setDeleteModalOpen(true);
-                                        }}
-                                    />
-                                </div>
-                            </CardSkeleton>
+                            <ExpensesTableSkeleton />
                         </div>
                         :
-                        <div className="w-full">
-                            <CardSkeleton>
-                                <div className="flex flex-col gap-4 justify-center items-center py-12">
-                                    <div className="flex items-center justify-center size-16 bg-neutral-100/60 rounded-full text-neutral-500">
-                                        <TrendingDown size={24} />
+                        query.data?.length ?
+                            <div className="w-full">
+                                <CardSkeleton padding={{ left: 0, right: 0 }}>
+                                    <div className="flex items-center border-b-1 border-slate-200 pl-6 pb-4 gap-2">
+                                        <div className="w-80">
+                                            <SearchInput
+                                                placeholder="Buscar por despesas..."
+                                                onChange={(e) => setSearch(e.target.value)}
+                                                onKeyDown={(e) => e.key === "Enter" ? handleSearch() : null}
+                                            />
+                                        </div>
+
+                                        <Badge variant="default">
+                                            <span className="font-bold">
+                                                {currentDate.toLocaleDateString("pt-BR", { month: "long" })[0].toUpperCase() + currentDate.toLocaleDateString("pt-BR", { month: "long" }).slice(1)}
+                                            </span>
+                                        </Badge>
+
+                                        <Badge variant="default">
+                                            <span className="font-bold">
+                                                {currentDate.toLocaleDateString("pt-BR", { year: "numeric" })}
+                                            </span>
+                                        </Badge>
+
+                                        <Badge variant="default">
+                                            <span className="font-bold">
+                                                Todas as categorias
+                                            </span>
+                                        </Badge>
                                     </div>
 
-                                    <span className="text-lg font-[600]">{`Nenhum registro em ${currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}`}</span>
+                                    <div>
+                                        <ExpensesTable
+                                            data={tableData}
+                                            onEditClick={(expense) => {
+                                                setSelectedExpense(expense);
+                                                setAddModalOpen(true);
+                                            }}
+                                            onDeleteClick={(expense) => {
+                                                setSelectedExpense(expense);
+                                                setDeleteModalOpen(true);
+                                            }}
+                                        />
+                                    </div>
+                                </CardSkeleton>
+                            </div>
+                            :
+                            <div className="w-full">
+                                <CardSkeleton>
+                                    <div className="flex flex-col gap-4 justify-center items-center py-12">
+                                        <div className="flex items-center justify-center size-16 bg-neutral-100/60 rounded-full text-neutral-500">
+                                            <TrendingDown size={24} />
+                                        </div>
 
-                                    <span className="text-sm text-center w-2/5">Nenhuma despesa foi encontrada no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova despesa neste mês.</span>
-                                </div>
-                            </CardSkeleton>
-                        </div>
+                                        <span className="text-lg font-[600]">{`Nenhum registro em ${currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}`}</span>
+
+                                        <span className="text-sm text-center w-2/5">Nenhuma despesa foi encontrada no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova despesa neste mês.</span>
+                                    </div>
+                                </CardSkeleton>
+                            </div>
                 }
             </div>
         </>

@@ -8,6 +8,7 @@ import DeleteModal from '../components/modals/DeleteConfirmModal';
 import { useToast } from '../hooks/useToast';
 import { formatMoney } from '../utils';
 import { CardSkeleton } from '../components/CardSkeleton';
+import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { useDate } from '../hooks/useDate';
 import type { Category } from '../api/types/category';
 import { AddOrEditCategoryModal } from '../components/modals/AddOrEditCategoryModal';
@@ -44,6 +45,8 @@ export default function Main() {
 
     const expenses = queries[0].data;
     const categories = queries[1].data;
+
+    const isLoadingExpenses = queries[0].isPending;
 
     async function deleteSelectedCategory() {
         try {
@@ -176,12 +179,16 @@ export default function Main() {
                                                 <span className="text-md font-[600]">
                                                     {category.title}
                                                 </span>
-                                                <span className="text-[11px]/2 text-neutral-600">
-                                                    {expenses?.reduce((acc, expense) => {
-                                                        if (expense.category.id === category.id) return acc + 1;
-                                                        return acc;
-                                                    }, 0)} transações
-                                                </span>
+                                                {isLoadingExpenses ?
+                                                    <LoadingSkeleton className="h-3 w-16 rounded-lg mt-1" />
+                                                    :
+                                                    <span className="text-[11px]/2 text-neutral-600">
+                                                        {expenses?.reduce((acc, expense) => {
+                                                            if (expense.category.id === category.id) return acc + 1;
+                                                            return acc;
+                                                        }, 0)} transações
+                                                    </span>
+                                                }
                                             </div>
                                         </div>
 
@@ -190,12 +197,16 @@ export default function Main() {
                                         <MoreOptionButton onClick={(e) => handleMoreOptionsButton(e, category)} />
                                     </div>
 
-                                    <span className="font-[600] text-2xl">{
-                                        formatMoney(String(Number(expenses?.reduce((acc, expense) => {
-                                            if (expense.category.id === category.id) return acc + Number(expense.amount);
-                                            return acc;
-                                        }, 0)).toFixed(2)))
-                                    }</span>
+                                    {isLoadingExpenses ?
+                                        <LoadingSkeleton className="h-8 w-32 rounded-lg" />
+                                        :
+                                        <span className="font-[600] text-2xl">{
+                                            formatMoney(String(Number(expenses?.reduce((acc, expense) => {
+                                                if (expense.category.id === category.id) return acc + Number(expense.amount);
+                                                return acc;
+                                            }, 0)).toFixed(2)))
+                                        }</span>
+                                    }
                                 </CardSkeleton>
                             </div>
                         )
