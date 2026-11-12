@@ -277,8 +277,8 @@ export default function Main() {
         <div className="flex flex-col items-center w-full">
             <div className="w-full flex justify-between items-end mb-4">
                 <div className="flex flex-col">
-                    <span className="text-3xl font-[600]">
-                        {`${handleGreeting()}, ${authContext.user?.name?.split(" ")[0]}`}
+                    <span className="text-3xl font-[600] flex">
+                        {handleGreeting()}, { authContext.user?.name ? `${authContext.user?.name?.split(" ")[0]}` : <LoadingSkeleton className="h-6 w-32 rounded-full mt-1 ml-2" /> }
                     </span>
                     <span className="text-sm/6 text-neutral-600">
                         {`Este é o seu retrato financeiro em ${currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}.`}
