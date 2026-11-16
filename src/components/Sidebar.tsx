@@ -109,7 +109,8 @@ export function Sidebar(props: SidebarProps) {
                         </div>
                     </div>
 
-                    <div className="px-6 py-2">
+                    {/* Hidden below lg: the floating "+" button adds expenses there */}
+                    <div className="hidden lg:block px-6 py-2">
                         <Button variant="primary" onClick={openExpenseModal}>
                             <div className="flex items-center gap-2">
                                 <Plus size={16} strokeWidth={3} />
@@ -118,7 +119,10 @@ export function Sidebar(props: SidebarProps) {
                         </Button>
                     </div>
 
-                    <MonthSelector />
+                    {/* Hidden below lg: the top bar has the same month selector */}
+                    <div className="hidden lg:block">
+                        <MonthSelector />
+                    </div>
 
                     <div className="flex flex-col font-semibold py-4 px-4 gap-2">
                         <SidebarButton disabled={pathname === "/dashboard" ? true : false} onClick={() => goTo("/dashboard")}>
