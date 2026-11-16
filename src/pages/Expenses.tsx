@@ -21,8 +21,8 @@ import { queryClient } from '../Routes';
 function ExpensesTableSkeleton() {
     return (
         <CardSkeleton padding={{ left: 0, right: 0 }}>
-            <div className="flex items-center border-b-1 border-slate-200 pl-6 pb-4 gap-2">
-                <LoadingSkeleton className="h-9 w-80 rounded-full" />
+            <div className="flex flex-wrap items-center border-b-1 border-slate-200 px-4 md:pl-6 md:pr-0 pb-4 gap-2">
+                <LoadingSkeleton className="h-9 w-full md:w-80 rounded-full" />
                 <LoadingSkeleton className="h-6 w-20 rounded-full" />
                 <LoadingSkeleton className="h-6 w-14 rounded-full" />
                 <LoadingSkeleton className="h-6 w-32 rounded-full" />
@@ -32,7 +32,7 @@ function ExpensesTableSkeleton() {
                 {[0, 1, 2, 3, 4, 5].map(index => (
                     <div
                         key={`expenses-skeleton-row-${index}`}
-                        className="flex justify-between items-center py-3 px-6 gap-6 border-b-1 border-slate-200 last:border-0"
+                        className="flex justify-between items-center py-3 px-4 md:px-6 gap-6 border-b-1 border-slate-200 last:border-0"
                     >
                         <div className="flex flex-col gap-2 flex-2">
                             <LoadingSkeleton className="h-5 w-40 rounded-lg" />
@@ -40,12 +40,13 @@ function ExpensesTableSkeleton() {
                         </div>
 
                         {[0, 1, 2, 3, 4].map(column => (
-                            <div key={`expenses-skeleton-col-${index}-${column}`} className="flex-1">
+                            <div key={`expenses-skeleton-col-${index}-${column}`} className="hidden xl:block flex-1">
                                 <LoadingSkeleton className="h-4 w-20 rounded-lg" />
                             </div>
                         ))}
 
-                        <div className="size-8" />
+                        <LoadingSkeleton className="xl:hidden h-4 w-20 rounded-lg" />
+                        <div className="hidden xl:block size-8" />
                     </div>
                 ))}
             </div>
@@ -142,9 +143,9 @@ export default function Main() {
                 : null}
 
             <div className="flex flex-col grid-cols-3 items-center w-full">
-                <div className="flex justify-between items-center mb-4 w-full">
+                <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center mb-4 w-full">
                     <div className="flex flex-col">
-                        <span className="text-3xl font-[600]">
+                        <span className="text-2xl md:text-3xl font-[600]">
                             Despesas
                         </span>
                         {query.isPending ?
@@ -156,7 +157,7 @@ export default function Main() {
                         }
                     </div>
 
-                    <div className="w-max">
+                    <div className="w-full md:w-max">
                         <Button
                             variant="primary"
                             onClick={() => setAddModalOpen(true)}
@@ -178,8 +179,8 @@ export default function Main() {
                         query.data?.length ?
                             <div className="w-full">
                                 <CardSkeleton padding={{ left: 0, right: 0 }}>
-                                    <div className="flex items-center border-b-1 border-slate-200 pl-6 pb-4 gap-2">
-                                        <div className="w-80">
+                                    <div className="flex flex-wrap items-center border-b-1 border-slate-200 px-4 md:pl-6 md:pr-0 pb-4 gap-2">
+                                        <div className="w-full md:w-80">
                                             <SearchInput
                                                 placeholder="Buscar por despesas..."
                                                 onChange={(e) => setSearch(e.target.value)}
@@ -231,7 +232,7 @@ export default function Main() {
 
                                         <span className="text-lg font-[600]">{`Nenhum registro em ${currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}`}</span>
 
-                                        <span className="text-sm text-center w-2/5">Nenhuma despesa foi encontrada no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova despesa neste mês.</span>
+                                        <span className="text-sm text-center w-full md:w-2/5">Nenhuma despesa foi encontrada no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova despesa neste mês.</span>
                                     </div>
                                 </CardSkeleton>
                             </div>

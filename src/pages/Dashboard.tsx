@@ -136,7 +136,7 @@ function DashboardSkeleton() {
     return (
         <>
             {[0, 1, 2].map(index => (
-                <div key={`dashboard-card-skeleton-${index}`} className="col-span-2">
+                <div key={`dashboard-card-skeleton-${index}`} className="md:col-span-2">
                     <CardSkeleton>
                         <div className="flex justify-between items-center">
                             <LoadingSkeleton className="size-10 rounded-full" />
@@ -151,7 +151,7 @@ function DashboardSkeleton() {
                 </div>
             ))}
 
-            <div className="col-span-4">
+            <div className="md:col-span-4">
                 <CardSkeleton>
                     <div className="flex flex-col gap-2 mb-4">
                         <LoadingSkeleton className="h-5 w-48 rounded-lg" />
@@ -161,7 +161,7 @@ function DashboardSkeleton() {
                 </CardSkeleton>
             </div>
 
-            <div className="col-span-2">
+            <div className="md:col-span-2">
                 <CardSkeleton>
                     <div className="flex flex-col gap-2 mb-4">
                         <LoadingSkeleton className="h-5 w-40 rounded-lg" />
@@ -176,7 +176,7 @@ function DashboardSkeleton() {
                 </CardSkeleton>
             </div>
 
-            <div className="col-span-4">
+            <div className="md:col-span-4">
                 <CardSkeleton padding={{ left: 0, right: 0 }}>
                     <div className="flex flex-col gap-2 px-6 mb-3">
                         <LoadingSkeleton className="h-5 w-40 rounded-lg" />
@@ -201,7 +201,7 @@ function DashboardSkeleton() {
                 </CardSkeleton>
             </div>
 
-            <div className="col-span-2">
+            <div className="md:col-span-2">
                 <CardSkeleton>
                     <div className="flex flex-col gap-2 mb-4">
                         <LoadingSkeleton className="h-5 w-48 rounded-lg" />
@@ -359,9 +359,9 @@ export default function Main() {
 
     return (
         <div className="flex flex-col items-center w-full">
-            <div className="w-full flex justify-between items-end mb-4">
+            <div className="w-full flex flex-col gap-3 md:flex-row md:justify-between md:items-end mb-4">
                 <div className="flex flex-col">
-                    <span className="text-3xl font-[600] flex">
+                    <span className="text-2xl md:text-3xl font-[600] flex flex-wrap">
                         {handleGreeting()}, { authContext.user?.name ? `${authContext.user?.name?.split(" ")[0]}` : <LoadingSkeleton className="h-6 w-32 rounded-full mt-1 ml-2" /> }
                     </span>
                     <span className="text-sm/6 text-neutral-600">
@@ -370,13 +370,13 @@ export default function Main() {
                 </div>
 
                 <div className="flex gap-2">
-                    <div className="w-[180px]">
+                    <div className="w-full md:w-[180px]">
                         <Button variant="secondary" onClick={handleExportReport} disabled={isLoading || !hasMonthData}>Exportar relatório</Button>
                     </div>
                 </div>
             </div>
             <div
-                className="grid grid-cols-6 gap-6 w-full"
+                className="grid grid-cols-1 md:grid-cols-6 gap-4 md:gap-6 w-full"
             >
                 {
                     isLoading ?
@@ -384,7 +384,7 @@ export default function Main() {
                         :
                         data.incomes?.length || data.expenses?.length ?
                             <>
-                                <div className="col-span-2">
+                                <div className="md:col-span-2">
                                     <CardSkeleton>
                                         <div className="flex justify-between items-center">
                                             <div className="bg-green-100 size-10 rounded-full flex justify-center items-center">
@@ -401,7 +401,7 @@ export default function Main() {
                                     </CardSkeleton>
                                 </div>
 
-                                <div className="col-span-2">
+                                <div className="md:col-span-2">
                                     <CardSkeleton>
                                         <div className="flex justify-between items-center">
                                             <div className="bg-red-100 size-10 rounded-full flex justify-center items-center">
@@ -418,7 +418,7 @@ export default function Main() {
                                     </CardSkeleton>
                                 </div>
 
-                                <div className="col-span-2">
+                                <div className="md:col-span-2">
                                     <CardSkeleton>
                                         <div className="flex justify-between items-center">
                                             <div className="bg-teal-100 size-10 rounded-full flex justify-center items-center">
@@ -438,7 +438,7 @@ export default function Main() {
                                     </CardSkeleton>
                                 </div>
 
-                                <div className="col-span-4">
+                                <div className="md:col-span-4">
                                     <CardSkeleton>
                                         <ExpensesVsIncomesBarChart
                                             data={incomesVsExpensesBarChartData}
@@ -453,7 +453,7 @@ export default function Main() {
                                     </CardSkeleton>
                                 </div>
 
-                                <div className="col-span-2">
+                                <div className="md:col-span-2">
                                     <CardSkeleton>
                                         <CustomPieChart
                                             data={expensesByCategoryPieData}
@@ -466,7 +466,7 @@ export default function Main() {
                                     </CardSkeleton>
                                 </div>
 
-                                <div className="col-span-4">
+                                <div className="md:col-span-4">
                                     <CardSkeleton padding={{ left: 0, right: 0 }}>
                                         {tableData ?
                                             <BasicTable
@@ -478,7 +478,7 @@ export default function Main() {
                                     </CardSkeleton>
                                 </div>
 
-                                <div className="col-span-2">
+                                <div className="md:col-span-2">
                                     <CardSkeleton>
                                         {expensesByPaymentMethod ?
                                             <CustomPieChart
@@ -496,7 +496,7 @@ export default function Main() {
                             </>
                             :
 
-                            <div className="col-span-6">
+                            <div className="col-span-full">
                                 <CardSkeleton>
                                     <div className="flex flex-col gap-4 justify-center items-center py-12">
                                         <div className="flex items-center justify-center size-16 bg-neutral-100/60 rounded-full text-neutral-500">
@@ -505,7 +505,7 @@ export default function Main() {
 
                                         <span className="text-lg font-[600]">{`Nenhum registro em ${currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}`}</span>
 
-                                        <span className="text-sm text-center w-2/5">Nenhum entrada ou despesa foram encontradas no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova entrada para começar a mapear.</span>
+                                        <span className="text-sm text-center w-full md:w-2/5">Nenhum entrada ou despesa foram encontradas no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova entrada para começar a mapear.</span>
                                     </div>
                                 </CardSkeleton>
                             </div>

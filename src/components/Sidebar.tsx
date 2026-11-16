@@ -7,9 +7,6 @@ import {
     Plus,
     Tags,
     Users,
-    Calendar,
-    ChevronRight,
-    ChevronLeft,
     Repeat,
     CreditCard
 } from "lucide-react";
@@ -22,6 +19,7 @@ import { Button } from "./Button";
 import { Icon } from "./Icon";
 import { queryClient } from "../Routes";
 import { expensesByMonthQuery } from "../queries/expenses";
+import { MonthSelector } from "./MonthSelector";
 
 function SidebarButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
     return (
@@ -34,7 +32,13 @@ function SidebarButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
     )
 }
 
-export function Sidebar() {
+type SidebarProps = {
+    // Drawer state on small screens (< lg). On lg and up the sidebar is always visible.
+    open: boolean
+    onClose: () => void
+}
+
+export function Sidebar(props: SidebarProps) {
     const [expenseModalOpen, setExpenseModalOpen] = useState(false);
     const [settingsPopupOpen, setSettingsPopupOpen] = useState(false);
 
@@ -42,29 +46,24 @@ export function Sidebar() {
 
     const navigate = useNavigate();
     const { pathname } = useLocation();
-    const { currentDate, setCurrentDate } = useDate();
+    const { currentDate } = useDate();
 
     function logout() {
+        props.onClose();
         navigate("/");
         authContext.logout();
     }
 
-    function setNextMonth() {
-        const nextDate = new Date(currentDate);
-
-        nextDate.setDate(13);
-        nextDate.setMonth(nextDate.getMonth() + 1);
-
-        setCurrentDate(nextDate);
+    // Navigates and closes the mobile drawer.
+    function goTo(path: string) {
+        props.onClose();
+        setSettingsPopupOpen(false);
+        navigate(path);
     }
 
-    function setPreviousMonth() {
-        const previousDate = new Date(currentDate);
-
-        previousDate.setDate(13);
-        previousDate.setMonth(previousDate.getMonth() - 1);
-
-        setCurrentDate(previousDate);
+    function openExpenseModal() {
+        props.onClose();
+        setExpenseModalOpen(true);
     }
 
     function handleNewExpense() {
@@ -83,11 +82,25 @@ export function Sidebar() {
                 />
                 : null}
 
+            {/* Mobile only: backdrop that closes the drawer */}
+            {props.open ?
+                <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={props.onClose} />
+                : null}
+
+            {/* Mobile only: floating "add expense" button */}
+            <button
+                aria-label="Adicionar despesa"
+                className="lg:hidden fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 flex justify-center items-center size-14 rounded-full cursor-pointer text-white bg-linear-to-r from-green-600/90 via-emerald-700/90 via-60% to-emerald-700 shadow-emerald-200 shadow-lg"
+                onClick={openExpenseModal}
+            >
+                <Plus size={24} strokeWidth={2.5} />
+            </button>
+
             <nav
-                className="fixed flex flex-col justify-between items-center w-70 min-h-screen bg-white border-r-1 border-slate-200"
+                className={`fixed inset-y-0 left-0 z-50 flex flex-col justify-between items-center w-70 h-dvh overflow-y-auto bg-white border-r-1 border-slate-200 transition-transform duration-200 lg:translate-x-0 ${props.open ? "translate-x-0" : "-translate-x-full"}`}
             >
                 <div className="w-full">
-                    <div className="flex justify-start items-center gap-2 px-6 h-20 w-full">
+                    <div className="flex justify-start items-center gap-2 px-6 h-20 w-full mt-[env(safe-area-inset-top)]">
                         <Icon size={20} />
                         <div className="flex flex-col">
                             <span className="text-black text-[16px] font-[600]">Expense Tracker</span>
@@ -96,7 +109,7 @@ export function Sidebar() {
                     </div>
 
                     <div className="px-6 py-2">
-                        <Button variant="primary" onClick={() => setExpenseModalOpen(true)}>
+                        <Button variant="primary" onClick={openExpenseModal}>
                             <div className="flex items-center gap-2">
                                 <Plus size={16} strokeWidth={3} />
                                 <span>Adicionar despesa</span>
@@ -104,71 +117,45 @@ export function Sidebar() {
                         </Button>
                     </div>
 
-                    <div className="flex flex-col gap-4 px-6 py-4 bg-linear-to-t from-green-50 to-white border-1 border-slate-200 rounded-3xl mx-4 mt-2">
-                        <div className="flex justify-between">
-                            <div className="flex gap-1 items-center">
-                                <Calendar size={12} />
-                                <span className="text-xs">PERÍODO</span>
-                            </div>
-                            <span className="text-green-500 text-xs underline cursor-pointer" onClick={() => setCurrentDate(new Date())}>Mês atual</span>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <div
-                                className="size-8 flex items-center justify-center text-neutral-600 rounded-full cursor-pointer"
-                                onClick={setPreviousMonth}
-                            >
-                                <ChevronLeft size={14} />
-                            </div>
-
-                            <span className="text-sm font-[600]">{currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })[0].toUpperCase() + currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" }).slice(1)}</span>
-
-                            <div
-                                className="size-8 flex items-center justify-center text-neutral-600 rounded-full cursor-pointer"
-                                onClick={setNextMonth}
-                            >
-                                <ChevronRight size={14} />
-                            </div>
-                        </div>
-                    </div>
+                    <MonthSelector />
 
                     <div className="flex flex-col font-semibold py-4 px-4 gap-2">
-                        <SidebarButton disabled={pathname === "/dashboard" ? true : false} onClick={() => navigate("/dashboard")}>
+                        <SidebarButton disabled={pathname === "/dashboard" ? true : false} onClick={() => goTo("/dashboard")}>
                             <div className="flex gap-2 items-center">
                                 <LayoutDashboard size={16} />
                                 <span className="text-sm">Dashboard</span>
                             </div>
                         </SidebarButton>
 
-                        <SidebarButton disabled={pathname === "/incomes" ? true : false} onClick={() => navigate("/incomes")}>
+                        <SidebarButton disabled={pathname === "/incomes" ? true : false} onClick={() => goTo("/incomes")}>
                             <div className="flex gap-2 items-center">
                                 <BanknoteArrowUp size={16} />
                                 <span className="text-sm">Entradas</span>
                             </div>
                         </SidebarButton>
 
-                        <SidebarButton disabled={pathname === "/expenses" ? true : false} onClick={() => navigate("/expenses")}>
+                        <SidebarButton disabled={pathname === "/expenses" ? true : false} onClick={() => goTo("/expenses")}>
                             <div className="flex gap-2 items-center">
                                 <BanknoteArrowDown size={16} />
                                 <span className="text-sm">Saídas</span>
                             </div>
                         </SidebarButton>
 
-                        <SidebarButton disabled={pathname === "/recurrences" ? true : false} onClick={() => navigate("/recurrences")}>
+                        <SidebarButton disabled={pathname === "/recurrences" ? true : false} onClick={() => goTo("/recurrences")}>
                             <div className="flex gap-2 items-center">
                                 <Repeat size={16} />
                                 <span className="text-sm">Recorrências</span>
                             </div>
                         </SidebarButton>
 
-                        <SidebarButton disabled={pathname === "/cards" ? true : false} onClick={() => navigate("/cards")}>
+                        <SidebarButton disabled={pathname === "/cards" ? true : false} onClick={() => goTo("/cards")}>
                             <div className="flex gap-2 items-center">
                                 <CreditCard size={16} />
                                 <span className="text-sm">Cartões</span>
                             </div>
                         </SidebarButton>
 
-                        <SidebarButton disabled={pathname === "/categories" ? true : false} onClick={() => navigate("/categories")}>
+                        <SidebarButton disabled={pathname === "/categories" ? true : false} onClick={() => goTo("/categories")}>
                             <div className="flex gap-2 items-center">
                                 <Tags size={16} />
                                 <span className="text-sm">Categorias</span>
@@ -190,13 +177,13 @@ export function Sidebar() {
                     </div>
 
 
-                    <div className="relative flex gap-2 w-full p-4 border-t-1 border-slate-200">
+                    <div className="relative flex gap-2 w-full p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t-1 border-slate-200">
                         <div className={
                             `absolute bottom-16 left-2 bg-green-900/10 backdrop-blur-lg border-1 border-slate-200 rounded-xl p-3
                             ${settingsPopupOpen ? undefined : "hidden"}
                             `
                         }>
-                            <button className="px-4 py-2 text-neutral-600 font-[600] bg-transparent hover:text-black disabled:bg-green-900/10 disabled:text-emerald-900 disabled:cursor-normal cursor-pointer w-full" onClick={() => navigate("/settings")}>
+                            <button className="px-4 py-2 text-neutral-600 font-[600] bg-transparent hover:text-black disabled:bg-green-900/10 disabled:text-emerald-900 disabled:cursor-normal cursor-pointer w-full" onClick={() => goTo("/settings")}>
                                 <div className="flex gap-2 items-center">
                                     <Settings size={16} strokeWidth={2.5} />
                                     <span className="text-sm">Configurações</span>

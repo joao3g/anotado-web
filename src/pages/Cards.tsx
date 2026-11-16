@@ -7,7 +7,7 @@ import { Button } from '../components/Button';
 import { Edit, Plus, Trash } from 'lucide-react';
 import DeleteModal from '../components/modals/DeleteConfirmModal';
 import { useToast } from '../hooks/useToast';
-import { amountToCents, formatMoney } from '../utils';
+import { amountToCents, formatMoney, getOptionsPopupPosition } from '../utils';
 import { CardSkeleton } from '../components/CardSkeleton';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { useDate } from '../hooks/useDate';
@@ -93,8 +93,7 @@ export default function Main() {
     }
 
     function handleMoreOptionsButton(e: React.MouseEvent, card: Card) {
-        const calcX = e.clientX - 80;
-        const calcY = e.clientY + 20;
+        const [calcX, calcY] = getOptionsPopupPosition(e);
 
         setSelectedCard(card);
         setMoreOptionsModalCoordinates([calcX, calcY]);
@@ -106,7 +105,7 @@ export default function Main() {
             {showMoreOptionsModal ?
                 <>
                     <div
-                        className={`fixed top-0 left-0 z-999 size-dvw bg-slate-900/2`}
+                        className={`fixed inset-0 z-999 bg-slate-900/2`}
                         onClick={() => {
                             setSelectedCard(undefined);
                             setShowMoreOptionsModal(false);
@@ -114,7 +113,7 @@ export default function Main() {
                     />
 
                     <div
-                        className={`absolute flex flex-col rounded-3xl w-40 bg-white z-999 border-1 border-slate-200 shadow-lg`}
+                        className={`fixed flex flex-col rounded-3xl w-40 bg-white z-999 border-1 border-slate-200 shadow-lg`}
                         style={{ left: moreOptionsModalCoordinates[0], top: moreOptionsModalCoordinates[1] }}
                     >
                         <button
@@ -163,9 +162,9 @@ export default function Main() {
                 : null}
 
             <div className="flex flex-col grid-cols-3 items-center w-full">
-                <div className="flex justify-between items-center mb-4 w-full">
+                <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center mb-4 w-full">
                     <div className="flex flex-col">
-                        <span className="text-3xl font-[600]">
+                        <span className="text-2xl md:text-3xl font-[600]">
                             Cartões
                         </span>
                         <span className="text-sm/6 text-neutral-600">
@@ -173,7 +172,7 @@ export default function Main() {
                         </span>
                     </div>
 
-                    <div className="w-max">
+                    <div className="w-full md:w-max">
                         <Button
                             variant="primary"
                             onClick={() => setAddOrEditModalOpen(true)}
@@ -193,7 +192,7 @@ export default function Main() {
                     : null}
 
                 <div
-                    className="grid grid-cols-4 gap-6 w-full"
+                    className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 w-full"
                 >
                     {
                         cards?.map(card => {

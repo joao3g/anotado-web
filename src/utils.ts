@@ -94,3 +94,16 @@ export const PAYMENT_METHOD_TO_COLOR_MAP = {
 // Color without "#", like category colors from the API.
 export const UNCATEGORIZED_TITLE = "Sem categoria";
 export const UNCATEGORIZED_COLOR = "A3A3A3";
+// Position of the "⋯" options popup (w-40 = 160px wide, about 90px tall) next to the tap or click.
+// Kept inside the screen on phones; opens above the tap when there is no room below.
+export const getOptionsPopupPosition = (event: { clientX: number, clientY: number }): [number, number] => {
+    const POPUP_WIDTH = 160;
+    const POPUP_HEIGHT = 90;
+    const MARGIN = 8;
+
+    const x = Math.max(MARGIN, Math.min(event.clientX - 80, window.innerWidth - POPUP_WIDTH - MARGIN));
+    const below = event.clientY + 20;
+    const y = below + POPUP_HEIGHT > window.innerHeight - MARGIN ? event.clientY - POPUP_HEIGHT - 10 : below;
+
+    return [x, Math.max(MARGIN, y)];
+};

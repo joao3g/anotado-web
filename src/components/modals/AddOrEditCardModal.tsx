@@ -65,7 +65,7 @@ export function AddOrEditCardModal(props: AddOrEditCardModalProps) {
 
     return (
         <div className="fixed inset-0 z-900 bg-black/60 flex items-center justify-center" onClick={props.onClose}>
-            <div className="flex flex-col gap-4 bg-white p-6 rounded-2xl w-xl" onClick={(event) => event.stopPropagation()}>
+            <div className="flex flex-col gap-4 bg-white p-6 rounded-2xl w-[calc(100%-2rem)] max-w-xl max-h-[90dvh] overflow-y-auto" onClick={(event) => event.stopPropagation()}>
                 <div className="flex flex-row justify-between">
                     <div className="flex flex-col">
                         <span className="text-xl font-[600]">
@@ -89,7 +89,7 @@ export function AddOrEditCardModal(props: AddOrEditCardModalProps) {
                     placeholder="Ex.: Nubank"
                 />
 
-                <div className="flex flex-row gap-6">
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                     <Input
                         type="text"
                         label="Últimos 4 dígitos (Opcional)"
