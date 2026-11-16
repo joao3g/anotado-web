@@ -17,6 +17,7 @@ import { CategoryIcon } from '../components/Icon';
 import { categoriesQuery } from '../queries/categories';
 import { queryClient } from '../Routes';
 import { expensesByMonthQuery } from '../queries/expenses';
+import { invalidateAfterRecurrenceChange } from '../queries/recurrences';
 
 export default function Main() {
     const data = useLoaderData<{
@@ -59,6 +60,10 @@ export default function Main() {
 
             setSelectedCategory(undefined);
             setDeleteModalOpen(false);
+
+            // The database removed the category from its expenses and recurrences:
+            // refetch them so every screen shows "Sem categoria" right away.
+            await invalidateAfterRecurrenceChange();
         } catch {
             addToast(`Falha ao excluir "${selectedCategory?.title}"!`, "error");
         }
@@ -184,7 +189,7 @@ export default function Main() {
                                                     :
                                                     <span className="text-[11px]/2 text-neutral-600">
                                                         {expenses?.reduce((acc, expense) => {
-                                                            if (expense.category.id === category.id) return acc + 1;
+                                                            if (expense.category?.id === category.id) return acc + 1;
                                                             return acc;
                                                         }, 0)} transações
                                                     </span>
@@ -202,7 +207,7 @@ export default function Main() {
                                         :
                                         <span className="font-[600] text-2xl">{
                                             formatMoney(String(Number(expenses?.reduce((acc, expense) => {
-                                                if (expense.category.id === category.id) return acc + Number(expense.amount);
+                                                if (expense.category?.id === category.id) return acc + Number(expense.amount);
                                                 return acc;
                                             }, 0)).toFixed(2)))
                                         }</span>

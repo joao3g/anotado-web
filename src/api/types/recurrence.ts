@@ -27,7 +27,7 @@ export type Recurrence = {
         groupId: string
         createdAt: string
         updatedAt: string
-    }
+    } | null // null when the category was deleted
     createdAt: string
     pastCount: number
     futureCount: number

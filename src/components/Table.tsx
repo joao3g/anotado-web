@@ -1,6 +1,6 @@
 import { Circle, CreditCard, Edit, Ticket, Trash, Wallet } from "lucide-react"
 import { useState } from "react"
-import { formatMoney, PAYMENT_METHOD_MAP } from "../utils"
+import { formatMoney, PAYMENT_METHOD_MAP, UNCATEGORIZED_COLOR, UNCATEGORIZED_TITLE } from "../utils"
 import { MoreOptionButton } from "./Input"
 import type { Expense } from "../api/types/expense"
 import { Badge } from "./Badge"
@@ -186,9 +186,9 @@ export function ExpensesTable(props: ExpensesTableProps) {
                         </div>
 
                         <div className="flex items-center gap-2 flex-1">
-                            <Circle size={10} color={`#${expense.category.color}`} fill={`#${expense.category.color}`} />
+                            <Circle size={10} color={`#${expense.category?.color ?? UNCATEGORIZED_COLOR}`} fill={`#${expense.category?.color ?? UNCATEGORIZED_COLOR}`} />
                             <span className="text-sm text-neutral-600">
-                                {expense.category.title}
+                                {expense.category?.title ?? UNCATEGORIZED_TITLE}
                             </span>
                         </div>
 

@@ -11,7 +11,7 @@ import { Badge } from '../components/Badge';
 import { CardSkeleton } from '../components/CardSkeleton';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { useToast } from '../hooks/useToast';
-import { formatMoney, PAYMENT_METHOD_MAP } from '../utils';
+import { formatMoney, PAYMENT_METHOD_MAP, UNCATEGORIZED_COLOR, UNCATEGORIZED_TITLE } from '../utils';
 
 type Filter = "ACTIVE" | "ENDED";
 
@@ -231,8 +231,8 @@ export default function Main() {
                                                     </div>
 
                                                     <div className="flex items-center gap-2 flex-1">
-                                                        <Circle size={10} color={`#${recurrence.category.color}`} fill={`#${recurrence.category.color}`} />
-                                                        <span className="text-sm text-neutral-600">{recurrence.category.title}</span>
+                                                        <Circle size={10} color={`#${recurrence.category?.color ?? UNCATEGORIZED_COLOR}`} fill={`#${recurrence.category?.color ?? UNCATEGORIZED_COLOR}`} />
+                                                        <span className="text-sm text-neutral-600">{recurrence.category?.title ?? UNCATEGORIZED_TITLE}</span>
                                                     </div>
 
                                                     <div className="flex-1">

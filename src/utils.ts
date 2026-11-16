@@ -89,3 +89,8 @@ export const PAYMENT_METHOD_TO_COLOR_MAP = {
     "DEBIT": "009A4D",
     "VOUCHER": "00B5B5"
 }
+
+// Shown for expenses and recurrences whose category was deleted (category is null).
+// Color without "#", like category colors from the API.
+export const UNCATEGORIZED_TITLE = "Sem categoria";
+export const UNCATEGORIZED_COLOR = "A3A3A3";
