@@ -172,7 +172,7 @@ export function Sidebar(props: SidebarProps) {
 
                         <div className="flex flex-col">
                             <span className="text-black text-[12px] font-[500]">{authContext.user?.group.title}</span>
-                            <span className="text-neutral-600 text-[9px]/3">{authContext.user?.group.totalMembers} membro{authContext.user?.group.totalMembers || 0 > 1 ? "s" : null}</span>
+                            <span className="text-neutral-600 text-[9px]/3">{authContext.user?.group.totalMembers} membro{authContext.user?.group.totalMembers === 1 ? "" : "s"}</span>
                         </div>
                     </div>
 
