@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
-import { Trash, Upload } from 'lucide-react';
+import { Camera, Images, Trash } from 'lucide-react';
 import { Avatar } from '../../components/Avatar';
+import { CameraModal } from '../../components/modals/CameraModal';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { CardSkeleton } from '../../components/CardSkeleton';
@@ -19,11 +20,27 @@ function PhotoCard(props: { user: User }) {
     const { addToast } = useToast();
     const fileInput = useRef<HTMLInputElement>(null);
     const [busy, setBusy] = useState(false);
+    const [cameraOpen, setCameraOpen] = useState(false);
+
+    // In-app camera only where the browser has one (HTTPS or localhost).
+    const canUseCamera = Boolean(navigator.mediaDevices?.getUserMedia);
 
     async function afterChange(message: string) {
         await authContext.refreshUser();
         queryClient.invalidateQueries({ queryKey: ['family'] }); // The photo also shows in the member list
         addToast(message, "success");
+    }
+
+    // Uploads an already resized photo. Returns true when saved.
+    async function saveAvatar(avatar: string) {
+        try {
+            await authService.updateAvatar(avatar);
+            await afterChange("Foto atualizada!");
+            return true;
+        } catch (error) {
+            addToast(getApiErrorMessage(error, "Não foi possível enviar a foto."), "error");
+            return false;
+        }
     }
 
     async function handleFile(event: React.ChangeEvent<HTMLInputElement>) {
@@ -40,13 +57,14 @@ function PhotoCard(props: { user: User }) {
                 return addToast("Não foi possível ler essa imagem. Tente uma foto JPG ou PNG.", "error");
             }
 
-            await authService.updateAvatar(avatar);
-            await afterChange("Foto atualizada!");
-        } catch (error) {
-            addToast(getApiErrorMessage(error, "Não foi possível enviar a foto."), "error");
+            await saveAvatar(avatar);
         } finally {
             setBusy(false);
         }
+    }
+
+    async function handleCameraCapture(avatar: string) {
+        if (await saveAvatar(avatar)) setCameraOpen(false);
     }
 
     async function handleRemove() {
@@ -63,6 +81,8 @@ function PhotoCard(props: { user: User }) {
 
     return (
         <CardSkeleton>
+            {cameraOpen ? <CameraModal onClose={() => setCameraOpen(false)} onCapture={handleCameraCapture} /> : null}
+
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <Avatar name={props.user.name} avatar={props.user.avatar} className="size-20 text-2xl" />
 
@@ -74,9 +94,16 @@ function PhotoCard(props: { user: User }) {
 
                     <div className="flex flex-wrap gap-2">
                         <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+                        {canUseCamera ?
+                            <div className="w-max">
+                                <Button variant="secondary" type="button" disabled={busy} onClick={() => setCameraOpen(true)}>
+                                    <span className="flex items-center gap-2"><Camera size={16} />Tirar foto</span>
+                                </Button>
+                            </div>
+                            : null}
                         <div className="w-max">
                             <Button variant="secondary" type="button" disabled={busy} onClick={() => fileInput.current?.click()}>
-                                <span className="flex items-center gap-2"><Upload size={16} />{busy ? "Aguarde..." : "Enviar foto"}</span>
+                                <span className="flex items-center gap-2"><Images size={16} />{busy ? "Aguarde..." : "Escolher da galeria"}</span>
                             </Button>
                         </div>
                         {props.user.avatar ?
