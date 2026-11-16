@@ -2,9 +2,9 @@ import { CardSkeleton } from '../components/CardSkeleton';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { ExpensesVsIncomesBarChart } from '../components/charts/BarChart';
 import type { Expense, ExpenseSummarized } from '../api/types/expense';
-import { formatMoney, getMonthOffset, PAYMENT_METHOD_MAP, PAYMENT_METHOD_TO_COLOR_MAP, UNCATEGORIZED_COLOR, UNCATEGORIZED_TITLE } from '../utils';
+import { amountToCents, formatMoney, getMonthOffset, PAYMENT_METHOD_MAP, PAYMENT_METHOD_TO_COLOR_MAP, UNCATEGORIZED_COLOR, UNCATEGORIZED_TITLE } from '../utils';
 import { Badge } from '../components/Badge';
-import { ArrowDownRight, ArrowUpRight, CalendarOff, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, CalendarOff, Minus, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { CustomPieChart } from '../components/charts/PieChart';
 import { Button } from '../components/Button';
@@ -26,9 +26,11 @@ function getExpenseTableData(expenses: Expense[] | undefined) {
                     expense.category?.title ?? UNCATEGORIZED_TITLE,
                     // UTC: the stored date is UTC midnight, so local time (UTC-3) would show the day before.
                     (new Date(expense.transactionDate)).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", timeZone: "UTC" }),
-                    PAYMENT_METHOD_MAP[expense.paymentMethod]
+                    PAYMENT_METHOD_MAP[expense.paymentMethod],
+                    // CREDIT only: which card the purchase is on.
+                    ...(expense.card ? [expense.card.title] : [])
                 ],
-                value: Number(expense.amount)
+                valueCents: amountToCents(expense.amount)
             }
         });
 }
@@ -61,17 +63,18 @@ function getExpensesByPaymentMethodPieData(expensesSummarized: ExpenseSummarized
     });
 }
 
-function getIncomesVsExpensesBarChartData(startDate: Date, expensesTotal: number[], incomesTotal: number[]) {
+function getIncomesVsExpensesBarChartData(startDate: Date, expensesTotalCents: number[], incomesTotalCents: number[]) {
     startDate.setMonth(startDate.getMonth() - 2);
 
-    if (expensesTotal.length !== incomesTotal.length) throw "expensesTotal and incomesTotal need to have the same size!";
+    if (expensesTotalCents.length !== incomesTotalCents.length) throw "expensesTotal and incomesTotal need to have the same size!";
 
     const data = [];
-    for (let index = 0; index < incomesTotal.length; index++) {
+    for (let index = 0; index < incomesTotalCents.length; index++) {
         data.push({
             name: startDate.toLocaleDateString("pt-BR", { month: "long" })[0].toUpperCase() + startDate.toLocaleDateString("pt-BR", { month: "long" }).slice(1),
-            expense: expensesTotal[index],
-            income: incomesTotal[index]
+            // The chart works in reais. The division is only for drawing; totals are summed in cents.
+            expense: expensesTotalCents[index] / 100,
+            income: incomesTotalCents[index] / 100
         });
 
         startDate = getMonthOffset(startDate, +1);
@@ -199,29 +202,30 @@ export default function Main() {
 
     const data = {
         incomes: incomesQueries[2].data,
-        incomesTotal: incomesQueries.map(query => {
+        // Totals per month in integer cents: no float rounding.
+        incomesTotalCents: incomesQueries.map(query => {
             const incomes = query.data;
 
-            if (incomes) return incomes.reduce((acc, income) => acc + Number(income.amount), 0);
+            if (incomes) return incomes.reduce((acc, income) => acc + amountToCents(income.amount), 0);
             return 0;
         }),
         expenses: expensesQueries[2].data,
-        expensesTotal: expensesQueries.map(query => {
+        expensesTotalCents: expensesQueries.map(query => {
             const expenses = query.data;
 
-            if (expenses) return expenses.reduce((acc, expense) => acc + Number(expense.amount), 0);
+            if (expenses) return expenses.reduce((acc, expense) => acc + amountToCents(expense.amount), 0);
             return 0;
         }),
         expensesSummarized: expensesSummarizedQuery.data
     }
 
-    const incomeTotal = data.incomesTotal[2];
-    const expenseTotal = data.expensesTotal[2];
+    const incomeTotalCents = data.incomesTotalCents[2];
+    const expenseTotalCents = data.expensesTotalCents[2];
 
     const tableData = getExpenseTableData(data.expenses);
     const expensesByCategoryPieData = getExpensesByCategoryPieData(data.expensesSummarized);
     const expensesByPaymentMethod = getExpensesByPaymentMethodPieData(data.expensesSummarized);
-    const incomesVsExpensesBarChartData = getIncomesVsExpensesBarChartData(new Date(currentDate), data.expensesTotal, data.incomesTotal);
+    const incomesVsExpensesBarChartData = getIncomesVsExpensesBarChartData(new Date(currentDate), data.expensesTotalCents, data.incomesTotalCents);
 
     function handleGreeting() {
         const now = new Date();
@@ -233,12 +237,28 @@ export default function Main() {
 
     function getPercentageBetweenValues(a: number, b: number) {
         const diff = Math.abs(a - b);
-        const percent = (diff * 100 / Math.abs(a)).toFixed(2);
+        // pt-BR format: "12,50%".
+        const percent = (diff * 100 / Math.abs(a)).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         return `${percent}%`;
     }
 
     function renderBadge(number1: number, number2: number, reverseLogic?: boolean) {
+        // No previous value (0): a percentage change can't be computed ("Infinity%"), so no badge is shown.
+        if (number1 === 0) return null;
+
+        // Same value in both months: neutral badge, no arrow.
+        if (number1 === number2) {
+            return (
+                <Badge variant="default">
+                    <div className="flex gap-2">
+                        <Minus size={16} />
+                        <span>0,00%</span>
+                    </div>
+                </Badge>
+            );
+        }
+
         const percentage = getPercentageBetweenValues(number1, number2);
         const isPositive = number1 > number2 ? false : true;
 
@@ -267,11 +287,11 @@ export default function Main() {
         );
     }
 
-    function getBalance(income: number, expense: number) {
-        const isPositive = income >= expense ? true : false;
-        const formatted = formatMoney(String((incomeTotal - expenseTotal).toFixed(2)));
+    // Integer cents. formatMoney drops the sign, so it is added back here.
+    function getBalance(incomeCents: number, expenseCents: number) {
+        const formatted = formatMoney(String(Math.abs(incomeCents - expenseCents)));
 
-        return isPositive ? formatted : `-${formatted}`;
+        return incomeCents >= expenseCents ? formatted : `-${formatted}`;
     }
 
     return (
@@ -308,12 +328,12 @@ export default function Main() {
                                                 <TrendingUp size={20} className="text-green-900" />
                                             </div>
 
-                                            {renderBadge(data.incomesTotal[1], data.incomesTotal[2])}
+                                            {renderBadge(data.incomesTotalCents[1], data.incomesTotalCents[2])}
                                         </div>
 
                                         <div className="flex flex-col justify-between items-start mt-6">
                                             <span className="text-xs font-[300]">Entradas somadas</span>
-                                            <span className="text-3xl font-[600]">{formatMoney(String(incomeTotal.toFixed(2)))}</span>
+                                            <span className="text-3xl font-[600]">{formatMoney(String(incomeTotalCents))}</span>
                                         </div>
                                     </CardSkeleton>
                                 </div>
@@ -325,12 +345,12 @@ export default function Main() {
                                                 <TrendingDown size={20} className="text-red-900" />
                                             </div>
 
-                                            {renderBadge(data.expensesTotal[1], data.expensesTotal[2], true)}
+                                            {renderBadge(data.expensesTotalCents[1], data.expensesTotalCents[2], true)}
                                         </div>
 
                                         <div className="flex flex-col justify-between items-start mt-6">
                                             <span className="text-xs font-[300]">Despesas somadas</span>
-                                            <span className="text-3xl font-[600]">{formatMoney(String(expenseTotal.toFixed(2)))}</span>
+                                            <span className="text-3xl font-[600]">{formatMoney(String(expenseTotalCents))}</span>
                                         </div>
                                     </CardSkeleton>
                                 </div>
@@ -343,14 +363,14 @@ export default function Main() {
                                             </div>
 
                                             {renderBadge(
-                                                data.incomesTotal[1] - data.expensesTotal[1],
-                                                data.incomesTotal[2] - data.expensesTotal[2]
+                                                data.incomesTotalCents[1] - data.expensesTotalCents[1],
+                                                data.incomesTotalCents[2] - data.expensesTotalCents[2]
                                             )}
                                         </div>
 
                                         <div className="flex flex-col justify-between items-start mt-6">
                                             <span className="text-xs font-[300]">Balanço mensal</span>
-                                            <span className="text-3xl font-[600]">{getBalance(incomeTotal, expenseTotal)}</span>
+                                            <span className="text-3xl font-[600]">{getBalance(incomeTotalCents, expenseTotalCents)}</span>
                                         </div>
                                     </CardSkeleton>
                                 </div>

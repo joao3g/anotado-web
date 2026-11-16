@@ -166,32 +166,32 @@ export default function Main() {
                     data={[
                         {
                             color: "#009A4D",
-                            value: 142.5,
+                            valueCents: 14250,
                             title: "Whole Foods",
                             description: ["Alimentação", "21 de maio", "Débito"]
                         },{
                             color: "#00B5B5",
-                            value: 38.2,
+                            valueCents: 3820,
                             title: "Uber rides",
                             description: ["Transporte", "20 de maio", "Crédito"]
                         },{
                             color: "#009A4D",
-                            value: 86.4,
+                            valueCents: 8640,
                             title: "Dinner - Bottega",
                             description: ["Alimentação", "18 de maio", "Vale"]
                         },{
                             color: "#796AE5",
-                            value: 120,
+                            valueCents: 12000,
                             title: "Nike sneakers",
                             description: ["Compras", "17 de maio", "Crédito"]
                         },{
                             color: "#C282D0",
-                            value: 32,
+                            valueCents: 3200,
                             title: "Pharmacy",
                             description: ["Saúde", "14 de maio", "Débito"]
                         },{
                             color: "#F14D4C",
-                            value: 28,
+                            valueCents: 2800,
                             title: "Cinema",
                             description: ["Entretenimento", "11 de maio", "Crédito"]
                         }

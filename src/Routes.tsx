@@ -4,11 +4,13 @@ import IncomesPage from "./pages/Incomes";
 import ExpensesPage from "./pages/Expenses";
 import CategoriesPage from "./pages/Categories";
 import RecurrencesPage from "./pages/Recurrences";
+import CardsPage from "./pages/Cards";
 import Dashboard from "./pages/Dashboard";
 import ComponentsPage from "./pages/Components";
 import AppLayout from "./layouts/AppLayout";
 import { authMiddleware } from "./loaders/auth";
 import { categoriesLoader } from "./loaders/categories";
+import { cardsLoader } from "./loaders/cards";
 import { QueryClient } from "@tanstack/react-query";
 
 export const queryClient = new QueryClient();
@@ -52,6 +54,11 @@ export const router = createBrowserRouter([
                 loader: authMiddleware,
                 path: "/recurrences",
                 element: <RecurrencesPage />,
+            },
+            {
+                loader: cardsLoader(queryClient),
+                path: "/cards",
+                element: <CardsPage />,
             },
             {
                 loader: categoriesLoader(queryClient),

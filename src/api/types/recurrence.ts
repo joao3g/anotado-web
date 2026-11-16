@@ -1,4 +1,4 @@
-import type { PaymentMethod } from "./expense";
+import type { ExpenseCard, PaymentMethod } from "./expense";
 
 type PaymentMethodValue = typeof PaymentMethod[keyof typeof PaymentMethod];
 
@@ -28,6 +28,7 @@ export type Recurrence = {
         createdAt: string
         updatedAt: string
     } | null // null when the category was deleted
+    card: ExpenseCard | null // Set only for CREDIT
     createdAt: string
     pastCount: number
     futureCount: number
@@ -43,6 +44,7 @@ export type RecurrenceCreate = {
     startDate: string // "YYYY-MM-DD"
     paymentMethod: PaymentMethodValue
     category: string
+    card?: string // Card id. Required for CREDIT, not sent otherwise.
     isEssential?: boolean
     totalInstallments: number | null
 }

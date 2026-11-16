@@ -8,7 +8,7 @@ import { AddOrEditIncomeModal } from '../components/modals/AddOrEditIncomeModal'
 import DeleteModal from '../components/modals/DeleteConfirmModal';
 import { deleteIncome } from '../api/services/income.service';
 import { useToast } from '../hooks/useToast';
-import { formatMoney } from '../utils';
+import { amountToCents, formatMoney } from '../utils';
 import { CardSkeleton } from '../components/CardSkeleton';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { useDate } from '../hooks/useDate';
@@ -29,7 +29,8 @@ export default function Main() {
     const query = useQuery(incomesByMonthQuery(currentDate));
 
     const incomes = query.data;
-    const incomesTotal = query.data?.reduce((acc, income) => acc + Number(income.amount) , 0).toFixed(2);
+    // Integer cents: no float rounding in the total.
+    const incomesTotalCents = query.data?.reduce((acc, income) => acc + amountToCents(income.amount), 0) ?? 0;
 
     async function deleteSelectedIncome() {
         try {
@@ -133,7 +134,7 @@ export default function Main() {
                             <LoadingSkeleton className="h-4 w-64 rounded-lg my-1" />
                             :
                             <span className="text-sm/6 text-neutral-600">
-                                {`${incomes?.length} fonte(s) de entrada · ${formatMoney(String(incomesTotal))} esse mês`}
+                                {`${incomes?.length} fonte(s) de entrada · ${formatMoney(String(incomesTotalCents))} esse mês`}
                             </span>
                         }
                     </div>
@@ -190,7 +191,7 @@ export default function Main() {
                                             <span className="text-md font-[600]">{income.title}</span>
                                         </div>
 
-                                        <span className="text-green-600 font-[600] text-2xl">+{formatMoney(String(Number(income.amount).toFixed(2)))}</span>
+                                        <span className="text-green-600 font-[600] text-2xl">+{formatMoney(String(amountToCents(income.amount)))}</span>
                                     </CardSkeleton>
                                 </div>
                             )

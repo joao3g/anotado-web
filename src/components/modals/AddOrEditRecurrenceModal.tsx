@@ -3,6 +3,8 @@ import { Input, SelectCard, Select, Slider } from "../Input";
 import { Button } from "../Button";
 import { CreditCard, Flame, Infinity as InfinityIcon, ListOrdered, Ticket, Wallet, X } from "lucide-react";
 import { listCategories } from "../../api/services/category.service";
+import { listCards } from "../../api/services/card.service";
+import { cardLabel } from "../../api/types/card";
 import { createRecurrence, updateRecurrence } from "../../api/services/recurrence.service";
 import { PaymentMethod } from "../../api/types/expense";
 import type { Recurrence, RecurrenceUpdate } from "../../api/types/recurrence";
@@ -31,6 +33,9 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
     // "" when the recurrence has no category (its category was deleted).
     const [categoryId, setCategoryId] = useState(props.data?.category?.id || "");
     const [categoryOptions, setCategoryOptions] = useState<{ value: string, title: string, selected?: boolean }[]>();
+    // Only used for CREDIT, and only when creating: the card of a series is not editable (it would move invoice dates).
+    const [cardId, setCardId] = useState("");
+    const [cardOptions, setCardOptions] = useState<{ value: string, title: string }[]>();
     const [isEssential, setIsEssential] = useState(props.data?.isEssential || false);
     const [description, setDescription] = useState(props.data?.description || "");
     const [saving, setSaving] = useState(false);
@@ -48,6 +53,8 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
         if (!isEdit && endsAfterCount && !installmentsValid) return `O número de parcelas deve ser entre ${MIN_INSTALLMENTS} e ${MAX_INSTALLMENTS}.`;
         // A new series needs a category. An existing one may stay "Sem categoria".
         if (!isEdit && !categoryId) return "Selecione uma categoria.";
+        // Every CREDIT series needs a card: its closing day decides each installment's invoice month.
+        if (!isEdit && paymentMethod === "CREDIT" && !cardId) return cardOptions?.length ? "Selecione um cartão." : "Cadastre um cartão na página Cartões.";
         return null;
     }
 
@@ -79,6 +86,7 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
                     startDate,
                     paymentMethod,
                     category: categoryId,
+                    card: paymentMethod === "CREDIT" ? cardId : undefined,
                     isEssential,
                     totalInstallments: endsAfterCount ? installments : null
                 });
@@ -109,7 +117,17 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
             }
         }
 
+        async function updateCardOptions() {
+            try {
+                const cards = await listCards();
+                setCardOptions(cards.map(card => ({ value: card.id, title: cardLabel(card) })));
+            } catch {
+                addToast("Erro ao buscar cartões!", "error");
+            }
+        }
+
         updateCategoriesOptions();
+        if (!isEdit) updateCardOptions();
     }, []);
 
     return (
@@ -234,6 +252,26 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
                                 : `Informe de ${MIN_INSTALLMENTS} a ${MAX_INSTALLMENTS} parcelas`
                         }
                     </div>
+                    : null}
+
+                {isEdit && props.data?.card ?
+                    <span className="text-sm text-neutral-600">
+                        Cartão: <span className="font-[600]">{cardLabel(props.data.card)}</span>
+                    </span>
+                    : null}
+
+                {!isEdit && paymentMethod === "CREDIT" ?
+                    (cardOptions && cardOptions.length === 0 ?
+                        <span className="text-xs text-orange-600">
+                            Nenhum cartão cadastrado. Cadastre um cartão na página Cartões para registrar compras no crédito.
+                        </span>
+                        :
+                        <Select
+                            label="Cartão"
+                            options={cardOptions}
+                            onChange={(e) => { setCardId(e.target.value); }}
+                        />
+                    )
                     : null}
 
                 <Select

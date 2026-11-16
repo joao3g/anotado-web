@@ -1,4 +1,4 @@
-import { Tag, Wallet } from "lucide-react";
+import { CreditCard, Tag, Wallet } from "lucide-react";
 import { hexToHsl } from "../utils";
 
 function getIconColor(color: string) {
@@ -21,6 +21,15 @@ export function CategoryIcon(props: { color: string }) {
     return (
         <div className="flex items-center justify-center size-10 rounded-full" style={{ backgroundColor: `#${props.color}` }}>
             <Tag size={18} color={getIconColor(props.color)} />
+        </div>
+    );
+}
+
+// Same look as CategoryIcon, with a card icon. `color` is hex WITHOUT "#".
+export function CardIcon(props: { color: string }) {
+    return (
+        <div className="flex items-center justify-center size-10 rounded-full" style={{ backgroundColor: `#${props.color}` }}>
+            <CreditCard size={18} color={getIconColor(props.color)} />
         </div>
     );
 }

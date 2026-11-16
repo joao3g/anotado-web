@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Circle, CreditCard, Pencil, Plus, Repeat, Ticket, Wallet, XCircle } from 'lucide-react';
+import { Circle, Pencil, Plus, Repeat, XCircle } from 'lucide-react';
 import type { Recurrence } from '../api/types/recurrence';
 import { cancelRecurrence } from '../api/services/recurrence.service';
 import { recurrencesQuery, invalidateAfterRecurrenceChange } from '../queries/recurrences';
@@ -11,7 +11,8 @@ import { Badge } from '../components/Badge';
 import { CardSkeleton } from '../components/CardSkeleton';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { useToast } from '../hooks/useToast';
-import { formatMoney, PAYMENT_METHOD_MAP, UNCATEGORIZED_COLOR, UNCATEGORIZED_TITLE } from '../utils';
+import { amountToCents, formatMoney, UNCATEGORIZED_COLOR, UNCATEGORIZED_TITLE } from '../utils';
+import { PaymentMethodBadge } from '../components/PaymentMethodBadge';
 
 type Filter = "ACTIVE" | "ENDED";
 
@@ -79,7 +80,8 @@ export default function Main() {
     const visible = filter === "ACTIVE" ? active : ended;
 
     // Sum of active installment values in integer cents ("150.00" -> 15000): exact, no float.
-    const activeMonthlyCents = active.reduce((acc, recurrence) => acc + Number(recurrence.amount.replace(/\D/g, "")), 0);
+    // amountToCents also handles amounts sent without 2 decimals ("150" -> 15000).
+    const activeMonthlyCents = active.reduce((acc, recurrence) => acc + amountToCents(recurrence.amount), 0);
 
     function closeModals() {
         setSelectedRecurrence(undefined);
@@ -208,11 +210,6 @@ export default function Main() {
                                         </div>
 
                                         {visible.map(recurrence => {
-                                            const paymentMethodIcon = recurrence.paymentMethod === "CREDIT" ?
-                                                <CreditCard size={16} /> : recurrence.paymentMethod === "DEBIT" ?
-                                                    <Wallet size={16} /> :
-                                                    <Ticket size={16} />;
-                                            const paymentMethodBadgeVariant = recurrence.paymentMethod === "CREDIT" ? "success" : recurrence.paymentMethod === "DEBIT" ? "info" : "default";
                                             const status = STATUS_BADGE[recurrence.status];
 
                                             return (
@@ -236,12 +233,7 @@ export default function Main() {
                                                     </div>
 
                                                     <div className="flex-1">
-                                                        <Badge variant={paymentMethodBadgeVariant}>
-                                                            <div className="flex gap-2">
-                                                                {paymentMethodIcon}
-                                                                {PAYMENT_METHOD_MAP[recurrence.paymentMethod]}
-                                                            </div>
-                                                        </Badge>
+                                                        <PaymentMethodBadge paymentMethod={recurrence.paymentMethod} card={recurrence.card} />
                                                     </div>
 
                                                     <div className="flex-1">
