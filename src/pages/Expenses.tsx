@@ -7,7 +7,7 @@ import DeleteModal from '../components/modals/DeleteConfirmModal';
 import { useToast } from '../hooks/useToast';
 import { AddOrEditExpenseModal } from '../components/modals/AddOrEditExpenseModal';
 import { deleteExpense } from '../api/services/expense.service';
-import { formatMoney, PAYMENT_METHOD_MAP } from '../utils';
+import { formatMoney, PAYMENT_METHOD_MAP, UNCATEGORIZED_TITLE } from '../utils';
 import { CardSkeleton } from '../components/CardSkeleton';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { Badge } from '../components/Badge';
@@ -79,7 +79,7 @@ export default function Main() {
             filteredExpenses = query.data?.filter(expense =>
                 expense.title.toLowerCase().includes(normalizedSearch) ||
                 expense.description?.toLowerCase().includes(normalizedSearch) ||
-                expense.category.title.toLowerCase().includes(normalizedSearch) ||
+                (expense.category?.title ?? UNCATEGORIZED_TITLE).toLowerCase().includes(normalizedSearch) ||
                 formatMoney(String(Number(expense.amount).toFixed(2))).toLowerCase().includes(normalizedSearch) ||
                 PAYMENT_METHOD_MAP[expense.paymentMethod]
                     .toLowerCase()

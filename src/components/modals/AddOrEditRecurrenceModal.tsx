@@ -28,7 +28,8 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
     const [startDate, setStartDate] = useState(props.data?.startDate.slice(0, 10) || new Date().toLocaleDateString("en-CA"));
     const [endsAfterCount, setEndsAfterCount] = useState(props.data ? props.data.totalInstallments !== null : true);
     const [installmentsInput, setInstallmentsInput] = useState(String(props.data?.totalInstallments ?? ""));
-    const [categoryId, setCategoryId] = useState(props.data?.category.id || "");
+    // "" when the recurrence has no category (its category was deleted).
+    const [categoryId, setCategoryId] = useState(props.data?.category?.id || "");
     const [categoryOptions, setCategoryOptions] = useState<{ value: string, title: string, selected?: boolean }[]>();
     const [isEssential, setIsEssential] = useState(props.data?.isEssential || false);
     const [description, setDescription] = useState(props.data?.description || "");
@@ -45,7 +46,8 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
         if (amountCents <= 0) return "Informe o valor da parcela.";
         if (!startDate) return "Informe a data da 1ª parcela.";
         if (!isEdit && endsAfterCount && !installmentsValid) return `O número de parcelas deve ser entre ${MIN_INSTALLMENTS} e ${MAX_INSTALLMENTS}.`;
-        if (!categoryId) return "Selecione uma categoria.";
+        // A new series needs a category. An existing one may stay "Sem categoria".
+        if (!isEdit && !categoryId) return "Selecione uma categoria.";
         return null;
     }
 
@@ -63,7 +65,7 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
                 if (title.trim() !== props.data.title) changes.title = title.trim();
                 if (description !== (props.data.description || "")) changes.description = description;
                 if (amountCents !== amountToCents(props.data.amount)) changes.amount = centsToAmountString(amountCents);
-                if (categoryId !== props.data.category.id) changes.category = categoryId;
+                if (categoryId && categoryId !== props.data.category?.id) changes.category = categoryId;
                 if (isEssential !== Boolean(props.data.isEssential)) changes.isEssential = isEssential;
 
                 await updateRecurrence(changes);
@@ -99,7 +101,7 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
                     setCategoryOptions(categories.map(category => ({
                         value: category.id,
                         title: category.title,
-                        selected: category.id === props.data?.category.id
+                        selected: category.id === props.data?.category?.id
                     })));
                 }
             } catch {

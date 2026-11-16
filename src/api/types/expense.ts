@@ -40,7 +40,7 @@ export type Expense = {
         groupId: string
         createdAt: string
         updatedAt: string
-    },
+    } | null, // null when the category was deleted
     // Set when the expense is an installment of a recurrence
     recurrenceId: string | null
     installmentNumber: number | null
@@ -55,9 +55,10 @@ export type ExpenseSummarized = {
     }[],
     summarizedByCategory: {
         _sum: { amount: string },
-        categoryId: string,
-        categoryTitle: string,
-        categoryColor: string
+        // All null for the group of expenses whose category was deleted
+        categoryId: string | null,
+        categoryTitle: string | null,
+        categoryColor: string | null
     }[],
     summarizedByPaymentMethod: {
         _sum: { amount: string },

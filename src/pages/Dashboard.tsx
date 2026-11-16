@@ -2,7 +2,7 @@ import { CardSkeleton } from '../components/CardSkeleton';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { ExpensesVsIncomesBarChart } from '../components/charts/BarChart';
 import type { Expense, ExpenseSummarized } from '../api/types/expense';
-import { formatMoney, getMonthOffset, PAYMENT_METHOD_MAP, PAYMENT_METHOD_TO_COLOR_MAP } from '../utils';
+import { formatMoney, getMonthOffset, PAYMENT_METHOD_MAP, PAYMENT_METHOD_TO_COLOR_MAP, UNCATEGORIZED_COLOR, UNCATEGORIZED_TITLE } from '../utils';
 import { Badge } from '../components/Badge';
 import { ArrowDownRight, ArrowUpRight, CalendarOff, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -21,9 +21,9 @@ function getExpenseTableData(expenses: Expense[] | undefined) {
         .map(expense => {
             return {
                 title: expense.title,
-                color: `#${expense.category.color}`,
+                color: `#${expense.category?.color ?? UNCATEGORIZED_COLOR}`,
                 description: [
-                    expense.category.title,
+                    expense.category?.title ?? UNCATEGORIZED_TITLE,
                     // UTC: the stored date is UTC midnight, so local time (UTC-3) would show the day before.
                     (new Date(expense.transactionDate)).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", timeZone: "UTC" }),
                     PAYMENT_METHOD_MAP[expense.paymentMethod]
@@ -43,8 +43,8 @@ function getExpensesByCategoryPieData(expensesSummarized: ExpenseSummarized | un
     expensesSummarized?.summarizedByCategory.forEach(item => {
         data.push({
             value: Number(item._sum.amount),
-            fill: "#" + item.categoryColor,
-            name: item.categoryTitle
+            fill: "#" + (item.categoryColor ?? UNCATEGORIZED_COLOR),
+            name: item.categoryTitle ?? UNCATEGORIZED_TITLE
         });
     });
 

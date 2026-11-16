@@ -23,7 +23,8 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
     // "YYYY-MM-DD" string end to end: no Date object, so Brazil (UTC-3) never shifts the day.
     // The API sends UTC midnight ("2026-12-05T00:00:00.000Z"), so the first 10 chars are the stored day.
     const [date, setDate] = useState(props.data?.transactionDate ? props.data.transactionDate.slice(0, 10) : new Date().toLocaleDateString("en-CA"));
-    const [categoryId, setCategoryId] = useState(props.data?.category.id || "");
+    // "" when the expense has no category (its category was deleted).
+    const [categoryId, setCategoryId] = useState(props.data?.category?.id || "");
     const [categoryOptions, setCategoryOptions] = useState<{ value: string, title: string, selected?: boolean }[]>();
     const [isEssential, setIsEssential] = useState(props.data?.isEssential || false);
     const [description, setDescription] = useState(props.data?.description || "");
@@ -31,6 +32,9 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
     const { addToast } = useToast();
 
     async function insertOrUpdateExpense(e: React.MouseEvent) {
+        // A new expense needs a category. An existing one may stay "Sem categoria".
+        if (!props.data && !categoryId) return addToast("Selecione uma categoria.", "error");
+
         try {
             if (paymentMethod) {
                 const data = {
@@ -39,16 +43,16 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
                     // The API takes a JSON number: "150.00" -> 150. The backend rejects anything with more than 2 decimals.
                     amount: Number(centsToAmountString(amountCents)),
                     date,
-                    paymentMethod,
-                    category: categoryId
+                    paymentMethod
                 };
 
                 if (props.data) {
-                    await updateExpense({ id: props.data.id, ...data });
+                    // No category selected = not sent, so the backend keeps the current value (no category).
+                    await updateExpense({ id: props.data.id, ...data, category: categoryId || undefined });
                     addToast("Despesa editada com sucesso!", "info");
                 }
                 else {
-                    await createExpense(data);
+                    await createExpense({ ...data, category: categoryId });
                     addToast("Despesa criada com sucesso!", "info");
                 }
 
@@ -67,7 +71,7 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
                     setCategoryOptions(categories.map(category => ({ 
                         value: category.id, 
                         title: category.title, 
-                        selected: category.id === props.data?.category.id
+                        selected: category.id === props.data?.category?.id
                     })));
                 }
             } catch (e) {
