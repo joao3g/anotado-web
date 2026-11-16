@@ -101,12 +101,13 @@ export function Select(props: SelectProps) {
 
 type SliderProps = {
     onChange: Function
+    checked?: boolean // Optional: when given, the switch shows this value (e.g. in edit modals)
 }
 
 export function Slider(props: SliderProps) {
     return (
         <label className="inline-flex items-center cursor-pointer select-none">
-            <input type="checkbox" className="sr-only peer" onChange={() => props.onChange()} />
+            <input type="checkbox" className="sr-only peer" checked={props.checked} onChange={() => props.onChange()} />
 
             <div className="
                 relative w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 peer-checked:bg-green-600

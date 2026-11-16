@@ -24,7 +24,8 @@ function getExpenseTableData(expenses: Expense[] | undefined) {
                 color: `#${expense.category.color}`,
                 description: [
                     expense.category.title,
-                    (new Date(expense.transactionDate)).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }),
+                    // UTC: the stored date is UTC midnight, so local time (UTC-3) would show the day before.
+                    (new Date(expense.transactionDate)).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", timeZone: "UTC" }),
                     PAYMENT_METHOD_MAP[expense.paymentMethod]
                 ],
                 value: Number(expense.amount)

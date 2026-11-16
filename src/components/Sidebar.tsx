@@ -9,7 +9,8 @@ import {
     Users,
     Calendar,
     ChevronRight,
-    ChevronLeft
+    ChevronLeft,
+    Repeat
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useDate } from "../hooks/useDate";
@@ -149,6 +150,13 @@ export function Sidebar() {
                             <div className="flex gap-2 items-center">
                                 <BanknoteArrowDown size={16} />
                                 <span className="text-sm">Saídas</span>
+                            </div>
+                        </SidebarButton>
+
+                        <SidebarButton disabled={pathname === "/recurrences" ? true : false} onClick={() => navigate("/recurrences")}>
+                            <div className="flex gap-2 items-center">
+                                <Repeat size={16} />
+                                <span className="text-sm">Recorrências</span>
                             </div>
                         </SidebarButton>
 

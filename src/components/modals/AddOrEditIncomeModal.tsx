@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { useToast } from "../../hooks/useToast";
 import type { Income } from "../../api/types/income";
 import { createIncome, updateIncome } from "../../api/services/income.service";
+import { amountToCents, centsToAmountString, formatMoney, inputToCents } from "../../utils";
 
 type AddOrEditIncomeModalProps = {
     onClose: React.MouseEventHandler
@@ -15,8 +16,11 @@ type AddOrEditIncomeModalProps = {
 export function AddOrEditIncomeModal(props: AddOrEditIncomeModalProps) {
 
     const [title, setTitle] = useState(props.data?.title || "");
-    const [amount, setAmount] = useState(Number(props.data?.amount) || 0);
-    const [date, setDate] = useState(props.data?.date ? new Date(props.data.date) : new Date());
+    // Integer cents: no float math in the form.
+    const [amountCents, setAmountCents] = useState(props.data ? amountToCents(props.data.amount) : 0);
+    // "YYYY-MM-DD" string end to end: no Date object, so Brazil (UTC-3) never shifts the day.
+    // Before, 01/12 (UTC midnight) became 30/11 locally, and the backend moved it to 01/11: one month early.
+    const [date, setDate] = useState(props.data?.date ? props.data.date.slice(0, 10) : new Date().toLocaleDateString("en-CA"));
 
     const { addToast } = useToast();
 
@@ -24,8 +28,9 @@ export function AddOrEditIncomeModal(props: AddOrEditIncomeModalProps) {
         try {
             const data = {
                 title,
-                amount,
-                date: date.toLocaleDateString("en-CA")
+                // The API takes a JSON number: "150.00" -> 150. The backend rejects anything with more than 2 decimals.
+                amount: Number(centsToAmountString(amountCents)),
+                date
             };
 
             if (props.data) {
@@ -74,15 +79,16 @@ export function AddOrEditIncomeModal(props: AddOrEditIncomeModalProps) {
                     <Input
                         type="text"
                         label="Valor (R$)"
-                        value={amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                        onChange={(e) => { setAmount(Number(e.target.value.replace(/\D/g, "") || 0) / 100); }}
+                        inputMode="numeric"
+                        value={formatMoney(String(amountCents))}
+                        onChange={(e) => { setAmountCents(inputToCents(e.target.value)); }}
                     />
 
                     <Input
                         type="date"
                         label="Data"
-                        value={date.toLocaleDateString("en-CA")}
-                        onChange={(e) => { setDate(new Date(e.target.value + "T00:00:00")) }}
+                        value={date}
+                        onChange={(e) => { setDate(e.target.value) }}
                     />
                 </div>
 
