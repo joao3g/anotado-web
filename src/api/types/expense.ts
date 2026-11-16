@@ -41,7 +41,6 @@ export type Expense = {
     transactionDate: string
     dueDate: string
     paymentMethod: typeof PaymentMethod[keyof typeof PaymentMethod]
-    isEssential?: boolean
     category: {
         id: string
         title: string

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Input, SelectCard, Select, Slider } from "../Input";
+import { Input, SelectCard, Select } from "../Input";
 import { Button } from "../Button";
-import { CreditCard, Flame, Infinity as InfinityIcon, ListOrdered, Ticket, Wallet, X } from "lucide-react";
+import { CreditCard, Infinity as InfinityIcon, ListOrdered, Ticket, Wallet, X } from "lucide-react";
 import { listCategories } from "../../api/services/category.service";
 import { listCards } from "../../api/services/card.service";
 import { cardLabel } from "../../api/types/card";
@@ -36,7 +36,6 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
     // Only used for CREDIT, and only when creating: the card of a series is not editable (it would move invoice dates).
     const [cardId, setCardId] = useState("");
     const [cardOptions, setCardOptions] = useState<{ value: string, title: string }[]>();
-    const [isEssential, setIsEssential] = useState(props.data?.isEssential || false);
     const [description, setDescription] = useState(props.data?.description || "");
     const [saving, setSaving] = useState(false);
 
@@ -73,7 +72,6 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
                 if (description !== (props.data.description || "")) changes.description = description;
                 if (amountCents !== amountToCents(props.data.amount)) changes.amount = centsToAmountString(amountCents);
                 if (categoryId && categoryId !== props.data.category?.id) changes.category = categoryId;
-                if (isEssential !== Boolean(props.data.isEssential)) changes.isEssential = isEssential;
 
                 await updateRecurrence(changes);
                 addToast("Recorrência editada com sucesso!", "info");
@@ -87,7 +85,6 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
                     paymentMethod,
                     category: categoryId,
                     card: paymentMethod === "CREDIT" ? cardId : undefined,
-                    isEssential,
                     totalInstallments: endsAfterCount ? installments : null
                 });
                 addToast("Recorrência criada com sucesso!", "info");
@@ -279,27 +276,6 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
                     options={categoryOptions}
                     onChange={(e) => { setCategoryId(e.target.value); }}
                 />
-
-                <div className="flex justify-between items-center w-full p-4 bg-slate-50/50 border-slate-200 border-1 rounded-3xl">
-                        <div className="flex gap-2 items-center">
-                            <div className="flex items-center justify-center size-10 bg-orange-100/60 rounded-full text-orange-500">
-                                <Flame size={18} />
-                            </div>
-
-                            <div className="flex flex-col">
-                                <span className="text-md font-[600]">
-                                    Despesa essencial
-                                </span>
-                                <span className="text-[11px] text-neutral-600">
-                                    Marque essa opção para definir essa despesa como essencial. <br />Ex.: Aluguel, contas que você não pode pular.
-                                </span>
-                            </div>
-                        </div>
-                        <Slider
-                            checked={isEssential}
-                            onChange={() => setIsEssential(!isEssential)}
-                        />
-                    </div>
 
                 <Input
                     type="text"

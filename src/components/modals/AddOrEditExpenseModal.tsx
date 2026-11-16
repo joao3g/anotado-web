@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Input, SelectCard, Select, Slider } from "../Input";
+import { Input, SelectCard, Select } from "../Input";
 import { Button } from "../Button";
-import { CreditCard, Flame, Ticket, Wallet, X } from "lucide-react";
+import { CreditCard, Ticket, Wallet, X } from "lucide-react";
 import { listCategories } from "../../api/services/category.service";
 import { listCards } from "../../api/services/card.service";
 import { cardLabel } from "../../api/types/card";
@@ -31,7 +31,6 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
     // Only used for CREDIT. "" = no card chosen yet.
     const [cardId, setCardId] = useState(props.data?.card?.id || "");
     const [cardOptions, setCardOptions] = useState<{ value: string, title: string, selected?: boolean }[]>();
-    const [isEssential, setIsEssential] = useState(props.data?.isEssential || false);
     const [description, setDescription] = useState(props.data?.description || "");
 
     const { addToast } = useToast();
@@ -196,27 +195,6 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
                     options={categoryOptions}
                     onChange={(e) => { setCategoryId(e.target.value); }}
                 />
-
-                <div className="flex justify-between items-center w-full p-4 bg-slate-50/50 border-slate-200 border-1 rounded-3xl">
-                    <div className="flex gap-2 items-center">
-                        <div className="flex items-center justify-center size-10 bg-orange-100/60 rounded-full text-orange-500">
-                            <Flame size={18} />
-                        </div>
-
-                        <div className="flex flex-col">
-                            <span className="text-md font-[600]">
-                                Despesa essencial
-                            </span>
-                            <span className="text-[11px] text-neutral-600">
-                                Marque essa opção para definir essa despesa como essencial. <br />Ex.: Aluguel, compras, contas que você não pode pular.
-                            </span>
-                        </div>
-                    </div>
-                    <Slider
-                        checked={isEssential}
-                        onChange={() => setIsEssential(!isEssential)}
-                    />
-                </div>
 
                 <Input
                     type="text"
