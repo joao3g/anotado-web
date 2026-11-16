@@ -23,7 +23,7 @@ function Main() {
             const result = await authService.login(login, password);
 
             authContext.login(result.token, result.user);
-            return navigate("/dashboard");
+            return navigate(result.user.group ? "/dashboard" : "/onboarding");
         } catch (error) {
             addToast("Login e/ou senha incorretos!", "error");
         }
@@ -68,7 +68,7 @@ function Main() {
                         </Button>
                     </div>
 
-                    <span className="text-neutral-600 text-xs">Ainda não tem conta? <span className="text-green-700 font-bold cursor-pointer" onClick={() => navigate("/components")}>Criar conta</span></span>
+                    <span className="text-neutral-600 text-xs">Ainda não tem conta? <span className="text-green-700 font-bold cursor-pointer" onClick={() => navigate("/register")}>Criar conta</span></span>
                 </div>
             </div>
             <div className="hidden lg:flex flex-1 justify-center bg-radial-[at_0%_90%] from-transparent from-10% via-green-600/12 to-transparent to-90% h-screen">

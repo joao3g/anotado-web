@@ -1,12 +1,15 @@
 import { createContext, useEffect, useState, type ReactNode } from "react"
 import { isAxiosError } from "axios"
 import { type User } from "../api/types/auth.ts"
-import { api } from "../api/services/client.ts"
+import * as authService from "../api/services/auth.service.ts"
+import { queryClient } from "../queryClient.ts"
 
 type AuthContextType = {
     user: User | null
     login: (token: string, user: User) => void
     logout: () => void
+    // Reloads the user from the API (after profile, photo or family changes)
+    refreshUser: () => Promise<User>
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null)
@@ -21,8 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         async function loadUser() {
             try {
-                const { data } = await api.get<User>("/auth/me");
-                setUser(data);
+                setUser(await authService.getMe());
             } catch (error) {
                 // Only a rejected token (401) ends the session.
                 if (isAxiosError(error) && error.response?.status === 401) {
@@ -52,10 +54,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
 
         localStorage.removeItem("token");
+
+        // Never show one account's cached money data to the next account on this device.
+        queryClient.clear();
+    }
+
+    async function refreshUser() {
+        const data = await authService.getMe();
+        setUser(data);
+
+        return data;
     }
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout, refreshUser }}>
             {children}
         </AuthContext.Provider>
     )

@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { Outlet } from "react-router";
+import { Navigate, Outlet } from "react-router";
 import { Sidebar } from "../components/Sidebar";
 import { MobileTopBar } from "../components/MobileTopBar";
+import { useAuth } from "../hooks/useAuth";
 
 export default function AppLayout() {
   // Sidebar drawer on small screens (< lg)
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { user } = useAuth();
+
+  // Logged in without a family: choose or create one first.
+  if (user && user.group === null) return <Navigate to="/onboarding" replace />;
 
   return (
     <div className="flex min-h-screen bg-slate-50">
