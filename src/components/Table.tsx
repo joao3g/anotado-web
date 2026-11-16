@@ -168,9 +168,18 @@ export function ExpensesTable(props: ExpensesTableProps) {
                         className="flex justify-between w-full items-center py-3 px-6 gap-6 border-b-1 border-slate-200 last:border-0 last:pb-0"
                     >
                         <div className="flex flex-col flex-2">
-                            <span className="text-lg font-[600]">
-                                {expense.title}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-lg font-[600]">
+                                    {expense.title}
+                                </span>
+                                {expense.recurrenceId ?
+                                    <Badge variant="default">
+                                        {expense.recurrence?.totalInstallments ?
+                                            `${expense.installmentNumber}/${expense.recurrence.totalInstallments}`
+                                            : "Recorrente"}
+                                    </Badge>
+                                    : null}
+                            </div>
                             <span className="text-[11px] text-neutral-600">
                                 {expense.description}
                             </span>

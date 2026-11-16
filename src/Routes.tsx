@@ -3,6 +3,7 @@ import LoginPage from "./pages/Login";
 import IncomesPage from "./pages/Incomes";
 import ExpensesPage from "./pages/Expenses";
 import CategoriesPage from "./pages/Categories";
+import RecurrencesPage from "./pages/Recurrences";
 import Dashboard from "./pages/Dashboard";
 import ComponentsPage from "./pages/Components";
 import AppLayout from "./layouts/AppLayout";
@@ -46,6 +47,11 @@ export const router = createBrowserRouter([
                 loader: authMiddleware,
                 path: "/expenses",
                 element: <ExpensesPage />,
+            },
+            {
+                loader: authMiddleware,
+                path: "/recurrences",
+                element: <RecurrencesPage />,
             },
             {
                 loader: categoriesLoader(queryClient),

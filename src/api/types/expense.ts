@@ -41,6 +41,10 @@ export type Expense = {
         createdAt: string
         updatedAt: string
     },
+    // Set when the expense is an installment of a recurrence
+    recurrenceId: string | null
+    installmentNumber: number | null
+    recurrence: { totalInstallments: number | null } | null
     createdAt: string
 }
 

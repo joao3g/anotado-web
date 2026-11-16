@@ -24,6 +24,19 @@ export const formatMoney = (value: string) => {
     return result;
 }
 
+// Money in forms is kept as integer cents, so no float math happens in the UI.
+// The API sends Decimals as strings, sometimes without trailing zeros: "150" -> 15000, "10.1" -> 1010, "99.90" -> 9990.
+export const amountToCents = (amount: string) => {
+    const [integer, fraction = ""] = amount.split(".");
+    return Number(integer) * 100 + Number(fraction.padEnd(2, "0").slice(0, 2));
+}
+
+// 15000 -> "150.00". Integer math only.
+export const centsToAmountString = (cents: number) => `${Math.trunc(cents / 100)}.${String(cents % 100).padStart(2, "0")}`;
+
+// Money inputs: keep only digits, max 10 (Decimal(10,2): up to 99.999.999,99).
+export const inputToCents = (value: string) => Number(value.replace(/\D/g, "").slice(0, 10) || 0);
+
 export const hexToHsl = (hex: string) => {
     hex = hex.replace("#", "")
 
