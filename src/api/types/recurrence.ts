@@ -15,7 +15,6 @@ export type Recurrence = {
     description: string | null
     amount: string // Value of EACH installment
     paymentMethod: PaymentMethodValue
-    isEssential: boolean | null
     startDate: string
     totalInstallments: number | null // null = never ends
     canceledAt: string | null
@@ -45,7 +44,6 @@ export type RecurrenceCreate = {
     paymentMethod: PaymentMethodValue
     category: string
     card?: string // Card id. Required for CREDIT, not sent otherwise.
-    isEssential?: boolean
     totalInstallments: number | null
 }
 
@@ -55,5 +53,4 @@ export type RecurrenceUpdate = {
     description?: string
     amount?: string
     category?: string
-    isEssential?: boolean
 }
