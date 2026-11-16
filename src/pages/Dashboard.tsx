@@ -151,7 +151,7 @@ function DashboardSkeleton() {
                 </div>
             ))}
 
-            <div className="md:col-span-4">
+            <div className="hidden md:block md:col-span-4">
                 <CardSkeleton>
                     <div className="flex flex-col gap-2 mb-4">
                         <LoadingSkeleton className="h-5 w-48 rounded-lg" />
@@ -369,7 +369,8 @@ export default function Main() {
                     </span>
                 </div>
 
-                <div className="flex gap-2">
+                {/* Hidden on phones (< md) */}
+                <div className="hidden md:flex gap-2">
                     <div className="w-full md:w-[180px]">
                         <Button variant="secondary" onClick={handleExportReport} disabled={isLoading || !hasMonthData}>Exportar relatório</Button>
                     </div>
@@ -438,7 +439,8 @@ export default function Main() {
                                     </CardSkeleton>
                                 </div>
 
-                                <div className="md:col-span-4">
+                                {/* Hidden on phones (< md) */}
+                                <div className="hidden md:block md:col-span-4">
                                     <CardSkeleton>
                                         <ExpensesVsIncomesBarChart
                                             data={incomesVsExpensesBarChartData}
