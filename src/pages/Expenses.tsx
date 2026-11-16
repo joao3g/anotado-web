@@ -157,7 +157,8 @@ export default function Main() {
                         }
                     </div>
 
-                    <div className="w-full md:w-max">
+                    {/* Hidden below lg: the floating "+" button adds expenses there */}
+                    <div className="hidden lg:block w-max">
                         <Button
                             variant="primary"
                             onClick={() => setAddModalOpen(true)}
