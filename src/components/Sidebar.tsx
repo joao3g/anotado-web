@@ -1,9 +1,7 @@
 import {
     LayoutDashboard,
-    LogOut,
     BanknoteArrowDown,
     BanknoteArrowUp,
-    Settings,
     Plus,
     Tags,
     Users,
@@ -20,7 +18,7 @@ import { Icon } from "./Icon";
 import { queryClient } from "../Routes";
 import { expensesByMonthQuery } from "../queries/expenses";
 import { MonthSelector } from "./MonthSelector";
-import { Avatar } from "./Avatar";
+import { AccountMenu } from "./AccountMenu";
 
 function SidebarButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
     return (
@@ -41,7 +39,6 @@ type SidebarProps = {
 
 export function Sidebar(props: SidebarProps) {
     const [expenseModalOpen, setExpenseModalOpen] = useState(false);
-    const [settingsPopupOpen, setSettingsPopupOpen] = useState(false);
 
     const authContext = useAuth();
 
@@ -58,7 +55,6 @@ export function Sidebar(props: SidebarProps) {
     // Navigates and closes the mobile drawer.
     function goTo(path: string) {
         props.onClose();
-        setSettingsPopupOpen(false);
         navigate(path);
     }
 
@@ -178,36 +174,7 @@ export function Sidebar(props: SidebarProps) {
                     </div>
 
 
-                    <div className="relative flex gap-2 w-full p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t-1 border-slate-200">
-                        <div className={
-                            `absolute bottom-16 left-2 bg-green-900/10 backdrop-blur-lg border-1 border-slate-200 rounded-xl p-3
-                            ${settingsPopupOpen ? undefined : "hidden"}
-                            `
-                        }>
-                            <button className="px-4 py-2 text-neutral-600 font-[600] bg-transparent hover:text-black disabled:bg-green-900/10 disabled:text-emerald-900 disabled:cursor-normal cursor-pointer w-full" onClick={() => goTo("/settings")}>
-                                <div className="flex gap-2 items-center">
-                                    <Settings size={16} strokeWidth={2.5} />
-                                    <span className="text-sm">Configurações</span>
-                                </div>
-                            </button>
-
-                            <button className="px-4 py-2 text-neutral-600 font-[600] bg-transparent hover:text-black disabled:bg-green-900/10 disabled:text-emerald-900 disabled:cursor-normal cursor-pointer w-full" onClick={logout}>
-                                <div className="flex gap-2 items-center">
-                                    <LogOut size={16} strokeWidth={2.5} />
-                                    <span className="text-sm">Sair</span>
-                                </div>
-                            </button>
-                        </div>
-
-                        <button aria-label="Abrir opções da conta" className="cursor-pointer rounded-full" onClick={() => setSettingsPopupOpen(!settingsPopupOpen)}>
-                            <Avatar name={authContext.user?.name} avatar={authContext.user?.avatar} />
-                        </button>
-
-                        <div className="flex flex-col min-w-0">
-                            <span className="text-black text-[14px] font-[500] truncate">{authContext.user?.name}</span>
-                            <span className="text-neutral-600 text-[11px]/3 truncate">{authContext.user?.email}</span>
-                        </div>
-                    </div>
+                    <AccountMenu onNavigate={goTo} onLogout={logout} />
                 </div>
             </nav>
         </>
