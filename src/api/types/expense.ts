@@ -11,6 +11,7 @@ export type ExpenseCreate = {
     date: string
     paymentMethod: typeof PaymentMethod[keyof typeof PaymentMethod]
     category: string
+    card?: string // Card id. Required for CREDIT, not sent otherwise.
 }
 
 export type ExpenseUpdate = {
@@ -21,6 +22,15 @@ export type ExpenseUpdate = {
     date?: string
     paymentMethod?: typeof PaymentMethod[keyof typeof PaymentMethod]
     category?: string
+    card?: string // Not sent = keep the current card
+}
+
+export type ExpenseCard = {
+    id: string
+    title: string
+    lastFourDigits: string | null
+    color: string // Hex WITHOUT "#"
+    closingDay: number
 }
 
 export type Expense = {
@@ -41,6 +51,7 @@ export type Expense = {
         createdAt: string
         updatedAt: string
     } | null, // null when the category was deleted
+    card: ExpenseCard | null // Set only for CREDIT
     // Set when the expense is an installment of a recurrence
     recurrenceId: string | null
     installmentNumber: number | null

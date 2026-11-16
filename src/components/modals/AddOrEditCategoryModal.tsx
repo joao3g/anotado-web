@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Input } from "../Input";
 import { Button } from "../Button";
-import { Check, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useToast } from "../../hooks/useToast";
 import { createCategory, updateCategory } from "../../api/services/category.service";
 import type { Category } from "../../api/types/category";
 import { CategoryIcon } from "../Icon";
+import { ColorPicker } from "../ColorPicker";
 
 type AddOrEditCategoryModalProps = {
     onClose: React.MouseEventHandler
@@ -78,37 +79,8 @@ export function AddOrEditCategoryModal(props: AddOrEditCategoryModalProps) {
                     onChange={(e) => { setDescription(e.target.value); }}
                 />
 
-                <div className="flex flex-col gap-2">
-                    <span className="font-[500] text-sm">Cor</span>
-                    <div className="flex flex-col gap-4 items-center w-full">
-                        <div className="flex items-center justify-around w-full">
-                            <div className={`flex justify-center items-center cursor-pointer rounded-full size-10 bg-[#009A4D] ${color === "009A4D" ? "border-2" : null}`} onClick={() => setColor("009A4D")}> 
-                                {color === "009A4D" ? <Check size={18} color="white" /> : null}
-                            </div>
+                <ColorPicker value={color} onChange={setColor} />
 
-                            <div className={`flex justify-center items-center cursor-pointer rounded-full size-10 bg-[#00B5B5] ${color === "00B5B5" ? "border-2" : null}`} onClick={() => setColor("00B5B5")}> 
-                                {color === "00B5B5" ? <Check size={18} color="white" /> : null}
-                            </div>
-
-                            <div className={`flex justify-center items-center cursor-pointer rounded-full size-10 bg-[#C37F00] ${color === "C37F00" ? "border-2" : null}`} onClick={() => setColor("C37F00")}> 
-                                {color === "C37F00" ? <Check size={18} color="white" /> : null}
-                            </div>
-
-                            <div className={`flex justify-center items-center cursor-pointer rounded-full size-10 bg-[#796AE5] ${color === "796AE5" ? "border-2" : null}`} onClick={() => setColor("796AE5")}> 
-                                {color === "796AE5" ? <Check size={18} color="white" /> : null}
-                            </div>
-
-                            <div className={`flex justify-center items-center cursor-pointer rounded-full size-10 bg-[#F14D4C] ${color === "F14D4C" ? "border-2" : null}`} onClick={() => setColor("F14D4C")}> 
-                                {color === "F14D4C" ? <Check size={18} color="white" /> : null}
-                            </div>
-
-                            <div className={`flex justify-center items-center cursor-pointer rounded-full size-10 bg-[#C282D0] ${color === "C282D0" ? "border-2" : null}`} onClick={() => setColor("C282D0")}> 
-                                {color === "C282D0" ? <Check size={18} color="white" /> : null}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
                 <div className="flex flex-col gap-2">
                     <span className="font-[500] text-sm">Preview</span>
                     <div className="flex justify-between items-center w-full p-4 bg-slate-50/50 border-slate-200 border-1 rounded-3xl">

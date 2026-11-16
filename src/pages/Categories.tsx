@@ -6,7 +6,7 @@ import { Button } from '../components/Button';
 import { Edit, Plus, Trash } from 'lucide-react';
 import DeleteModal from '../components/modals/DeleteConfirmModal';
 import { useToast } from '../hooks/useToast';
-import { formatMoney } from '../utils';
+import { amountToCents, formatMoney } from '../utils';
 import { CardSkeleton } from '../components/CardSkeleton';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { useDate } from '../hooks/useDate';
@@ -206,10 +206,11 @@ export default function Main() {
                                         <LoadingSkeleton className="h-8 w-32 rounded-lg" />
                                         :
                                         <span className="font-[600] text-2xl">{
-                                            formatMoney(String(Number(expenses?.reduce((acc, expense) => {
-                                                if (expense.category?.id === category.id) return acc + Number(expense.amount);
+                                            // Integer cents: no float rounding in the total.
+                                            formatMoney(String(expenses?.reduce((acc, expense) => {
+                                                if (expense.category?.id === category.id) return acc + amountToCents(expense.amount);
                                                 return acc;
-                                            }, 0)).toFixed(2)))
+                                            }, 0) ?? 0))
                                         }</span>
                                     }
                                 </CardSkeleton>

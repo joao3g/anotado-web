@@ -1,8 +1,9 @@
-import { Circle, CreditCard, Edit, Ticket, Trash, Wallet } from "lucide-react"
+import { Circle, Edit, Trash } from "lucide-react"
 import { useState } from "react"
-import { formatMoney, PAYMENT_METHOD_MAP, UNCATEGORIZED_COLOR, UNCATEGORIZED_TITLE } from "../utils"
+import { amountToCents, formatMoney, UNCATEGORIZED_COLOR, UNCATEGORIZED_TITLE } from "../utils"
 import { MoreOptionButton } from "./Input"
 import type { Expense } from "../api/types/expense"
+import { PaymentMethodBadge } from "./PaymentMethodBadge"
 import { Badge } from "./Badge"
 
 type ExpensesTableProps = {
@@ -16,7 +17,7 @@ type BasicTableProps = {
         color: string
         title: string
         description?: string[]
-        value: number
+        valueCents: number // Integer cents
     }[]
     caption: {
         title: string
@@ -63,7 +64,7 @@ export function BasicTable(props: BasicTableProps) {
                                             </div>
                                         </div>
 
-                                        <span className="text-red-500 font-semibold text-sm">-{formatMoney(String(entry.value.toFixed(2)))}</span>
+                                        <span className="text-red-500 font-semibold text-sm">-{formatMoney(String(entry.valueCents))}</span>
                                     </div>
                                 }
                             </div>
@@ -155,13 +156,6 @@ export function ExpensesTable(props: ExpensesTableProps) {
             : null}
 
             {props.data?.map((expense, index) => {
-                const paymentMethodIcon = expense.paymentMethod === "CREDIT" ?
-                    <CreditCard size={16} /> : expense.paymentMethod === "DEBIT" ?
-                        <Wallet size={16} /> :
-                        <Ticket size={16} />;
-
-                const paymentMethodBadgeVariant = expense.paymentMethod === "CREDIT" ? "success" : expense.paymentMethod === "DEBIT" ? "info" : "default";
-
                 return (
                     <div
                         key={`table-row-${index}`}
@@ -193,12 +187,7 @@ export function ExpensesTable(props: ExpensesTableProps) {
                         </div>
 
                         <div className="flex-1">
-                            <Badge variant={paymentMethodBadgeVariant}>
-                                <div className="flex gap-2">
-                                    {paymentMethodIcon}
-                                    {PAYMENT_METHOD_MAP[expense.paymentMethod]}
-                                </div>
-                            </Badge>
+                            <PaymentMethodBadge paymentMethod={expense.paymentMethod} card={expense.card} />
                         </div>
 
                         <div className="flex-1">
@@ -215,7 +204,7 @@ export function ExpensesTable(props: ExpensesTableProps) {
 
                         <div className="flex flex-1">
                             <span className="font-semibold text-sm text-red-500">
-                                {`-${formatMoney(String(Number(expense.amount).toFixed(2)))}`}
+                                {`-${formatMoney(String(amountToCents(expense.amount)))}`}
                             </span>
                         </div>
 

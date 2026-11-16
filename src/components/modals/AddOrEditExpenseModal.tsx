@@ -3,6 +3,8 @@ import { Input, SelectCard, Select, Slider } from "../Input";
 import { Button } from "../Button";
 import { CreditCard, Flame, Ticket, Wallet, X } from "lucide-react";
 import { listCategories } from "../../api/services/category.service";
+import { listCards } from "../../api/services/card.service";
+import { cardLabel } from "../../api/types/card";
 import { createExpense, updateExpense } from "../../api/services/expense.service";
 import { PaymentMethod, type Expense } from "../../api/types/expense";
 import { useToast } from "../../hooks/useToast";
@@ -26,6 +28,9 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
     // "" when the expense has no category (its category was deleted).
     const [categoryId, setCategoryId] = useState(props.data?.category?.id || "");
     const [categoryOptions, setCategoryOptions] = useState<{ value: string, title: string, selected?: boolean }[]>();
+    // Only used for CREDIT. "" = no card chosen yet.
+    const [cardId, setCardId] = useState(props.data?.card?.id || "");
+    const [cardOptions, setCardOptions] = useState<{ value: string, title: string, selected?: boolean }[]>();
     const [isEssential, setIsEssential] = useState(props.data?.isEssential || false);
     const [description, setDescription] = useState(props.data?.description || "");
 
@@ -34,6 +39,10 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
     async function insertOrUpdateExpense(e: React.MouseEvent) {
         // A new expense needs a category. An existing one may stay "Sem categoria".
         if (!props.data && !categoryId) return addToast("Selecione uma categoria.", "error");
+        // Every CREDIT expense needs a card: its closing day decides the invoice month.
+        if (paymentMethod === "CREDIT" && !cardId) {
+            return addToast(cardOptions?.length ? "Selecione um cartão." : "Cadastre um cartão na página Cartões.", "error");
+        }
 
         try {
             if (paymentMethod) {
@@ -48,11 +57,13 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
 
                 if (props.data) {
                     // No category selected = not sent, so the backend keeps the current value (no category).
-                    await updateExpense({ id: props.data.id, ...data, category: categoryId || undefined });
+                    // Card sent only when it changed (CREDIT only): the backend recomputes the invoice date when it is sent.
+                    const card = paymentMethod === "CREDIT" && cardId !== props.data.card?.id ? cardId : undefined;
+                    await updateExpense({ id: props.data.id, ...data, category: categoryId || undefined, card });
                     addToast("Despesa editada com sucesso!", "info");
                 }
                 else {
-                    await createExpense({ ...data, category: categoryId });
+                    await createExpense({ ...data, category: categoryId, card: paymentMethod === "CREDIT" ? cardId : undefined });
                     addToast("Despesa criada com sucesso!", "info");
                 }
 
@@ -79,7 +90,21 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
             }
         }
 
+        async function updateCardOptions() {
+            try {
+                const cards = await listCards();
+                setCardOptions(cards.map(card => ({
+                    value: card.id,
+                    title: cardLabel(card),
+                    selected: card.id === props.data?.card?.id
+                })));
+            } catch (e) {
+                addToast("Erro ao buscar cartões!", "error");
+            }
+        }
+
         updateCategoriesOptions();
+        updateCardOptions();
 
     }, []);
 
@@ -151,6 +176,20 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
                         onChange={(e) => { setDate(e.target.value) }}
                     />
                 </div>
+
+                {paymentMethod === "CREDIT" ?
+                    (cardOptions && cardOptions.length === 0 ?
+                        <span className="text-xs text-orange-600">
+                            Nenhum cartão cadastrado. Cadastre um cartão na página Cartões para registrar compras no crédito.
+                        </span>
+                        :
+                        <Select
+                            label="Cartão"
+                            options={cardOptions}
+                            onChange={(e) => { setCardId(e.target.value); }}
+                        />
+                    )
+                    : null}
 
                 <Select
                     label="Categoria"

@@ -7,7 +7,7 @@ import DeleteModal from '../components/modals/DeleteConfirmModal';
 import { useToast } from '../hooks/useToast';
 import { AddOrEditExpenseModal } from '../components/modals/AddOrEditExpenseModal';
 import { deleteExpense } from '../api/services/expense.service';
-import { formatMoney, PAYMENT_METHOD_MAP, UNCATEGORIZED_TITLE } from '../utils';
+import { amountToCents, formatMoney, PAYMENT_METHOD_MAP, UNCATEGORIZED_TITLE } from '../utils';
 import { CardSkeleton } from '../components/CardSkeleton';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { Badge } from '../components/Badge';
@@ -61,7 +61,8 @@ export default function Main() {
 
     const query = useQuery(expensesByMonthQuery(currentDate));
 
-    const expensesTotal = query.data?.reduce((acc, expense) => acc + Number(expense.amount), 0).toFixed(2);
+    // Integer cents: no float rounding in the total.
+    const expensesTotalCents = query.data?.reduce((acc, expense) => acc + amountToCents(expense.amount), 0) ?? 0;
 
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -80,10 +81,11 @@ export default function Main() {
                 expense.title.toLowerCase().includes(normalizedSearch) ||
                 expense.description?.toLowerCase().includes(normalizedSearch) ||
                 (expense.category?.title ?? UNCATEGORIZED_TITLE).toLowerCase().includes(normalizedSearch) ||
-                formatMoney(String(Number(expense.amount).toFixed(2))).toLowerCase().includes(normalizedSearch) ||
+                formatMoney(String(amountToCents(expense.amount))).toLowerCase().includes(normalizedSearch) ||
                 PAYMENT_METHOD_MAP[expense.paymentMethod]
                     .toLowerCase()
-                    .includes(normalizedSearch)
+                    .includes(normalizedSearch) ||
+                (expense.card?.title ?? "").toLowerCase().includes(normalizedSearch)
             );
         }
 
@@ -149,7 +151,7 @@ export default function Main() {
                             <LoadingSkeleton className="h-4 w-56 rounded-lg my-1" />
                             :
                             <span className="text-sm/6 text-neutral-600">
-                                {`${query.data?.length} transações esse mês · ${formatMoney(String(expensesTotal))}`}
+                                {`${query.data?.length} transações esse mês · ${formatMoney(String(expensesTotalCents))}`}
                             </span>
                         }
                     </div>
