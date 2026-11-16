@@ -6,8 +6,9 @@ type ButtonVariants =
 export type ButtonProps = {
     children: React.ReactNode
     variant: ButtonVariants
-    onClick: React.MouseEventHandler
+    onClick?: React.MouseEventHandler
     disabled?: boolean
+    type?: "button" | "submit" // Set "submit" inside a <form>; not set = browser default (as before)
 }
 
 const variants = {
@@ -26,6 +27,7 @@ export function Button(props: ButtonProps) {
             `}
             disabled={props.disabled}
             onClick={props.onClick}
+            type={props.type}
         >
             {props.children}
         </button>

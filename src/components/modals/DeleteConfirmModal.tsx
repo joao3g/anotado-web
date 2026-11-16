@@ -6,6 +6,7 @@ type ConfirmActionProps = {
     description: string
     onDelete: React.MouseEventHandler
     onClose: React.MouseEventHandler
+    confirmLabel?: string // Red button text. Default "Deletar".
 }
 
 export default function Main(props: ConfirmActionProps) {
@@ -38,7 +39,7 @@ export default function Main(props: ConfirmActionProps) {
                         <Button
                             variant="danger"
                             onClick={props.onDelete}
-                        >Deletar</Button>
+                        >{props.confirmLabel ?? "Deletar"}</Button>
                     </div>
                 </div>
             </div>

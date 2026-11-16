@@ -7,13 +7,20 @@ import RecurrencesPage from "./pages/Recurrences";
 import CardsPage from "./pages/Cards";
 import Dashboard from "./pages/Dashboard";
 import ComponentsPage from "./pages/Components";
+import RegisterPage from "./pages/Register";
+import OnboardingPage from "./pages/Onboarding";
+import SettingsPage from "./pages/settings/Settings";
+import ProfileTab from "./pages/settings/ProfileTab";
+import FamilyTab from "./pages/settings/FamilyTab";
+import SecurityTab from "./pages/settings/SecurityTab";
 import AppLayout from "./layouts/AppLayout";
 import { authMiddleware } from "./loaders/auth";
 import { categoriesLoader } from "./loaders/categories";
 import { cardsLoader } from "./loaders/cards";
-import { QueryClient } from "@tanstack/react-query";
+import { queryClient } from "./queryClient";
 
-export const queryClient = new QueryClient();
+// Re-exported: many files import queryClient from here.
+export { queryClient };
 
 export const router = createBrowserRouter([
     {
@@ -22,6 +29,19 @@ export const router = createBrowserRouter([
         loader: () => {
             if (localStorage.getItem("token")) throw redirect("/dashboard")
         },
+    },
+    {
+        path: "/register",
+        element: <RegisterPage />,
+        loader: () => {
+            if (localStorage.getItem("token")) throw redirect("/dashboard")
+        },
+    },
+    {
+        // Logged in, but without a family yet
+        path: "/onboarding",
+        element: <OnboardingPage />,
+        loader: authMiddleware,
     },
     {
         path: "/error",
@@ -64,6 +84,17 @@ export const router = createBrowserRouter([
                 loader: categoriesLoader(queryClient),
                 path: "/categories",
                 element: <CategoriesPage />,
+            },
+            {
+                loader: authMiddleware,
+                path: "/settings",
+                element: <SettingsPage />,
+                children: [
+                    { index: true, loader: () => redirect("/settings/profile") },
+                    { path: "profile", element: <ProfileTab /> },
+                    { path: "family", element: <FamilyTab /> },
+                    { path: "security", element: <SecurityTab /> },
+                ],
             },
         ],
     },

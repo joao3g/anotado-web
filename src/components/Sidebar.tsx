@@ -20,6 +20,7 @@ import { Icon } from "./Icon";
 import { queryClient } from "../Routes";
 import { expensesByMonthQuery } from "../queries/expenses";
 import { MonthSelector } from "./MonthSelector";
+import { Avatar } from "./Avatar";
 
 function SidebarButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
     return (
@@ -171,8 +172,8 @@ export function Sidebar(props: SidebarProps) {
                         </div>
 
                         <div className="flex flex-col">
-                            <span className="text-black text-[12px] font-[500]">{authContext.user?.group.title}</span>
-                            <span className="text-neutral-600 text-[9px]/3">{authContext.user?.group.totalMembers} membro{authContext.user?.group.totalMembers === 1 ? "" : "s"}</span>
+                            <span className="text-black text-[12px] font-[500]">{authContext.user?.group?.title}</span>
+                            <span className="text-neutral-600 text-[9px]/3">{authContext.user?.group?.totalMembers} membro{authContext.user?.group?.totalMembers === 1 ? "" : "s"}</span>
                         </div>
                     </div>
 
@@ -198,21 +199,13 @@ export function Sidebar(props: SidebarProps) {
                             </button>
                         </div>
 
-                        <div className="flex justify-center items-center cursor-pointer rounded-full size-10 bg-linear-120 from-emerald-600 from-30% to-teal-500" onClick={() => setSettingsPopupOpen(!settingsPopupOpen)}>
-                            <span className="font-[700] text-sm text-white/80">
-                                {
-                                    authContext.user?.name
-                                        .split(" ")
-                                        .map(name => name[0].toUpperCase())
-                                        .slice(0, 2)
-                                        .join("")
-                                }
-                            </span>
-                        </div>
+                        <button aria-label="Abrir opções da conta" className="cursor-pointer rounded-full" onClick={() => setSettingsPopupOpen(!settingsPopupOpen)}>
+                            <Avatar name={authContext.user?.name} avatar={authContext.user?.avatar} />
+                        </button>
 
-                        <div className="flex flex-col">
-                            <span className="text-black text-[14px] font-[500]">{authContext.user?.name}</span>
-                            <span className="text-neutral-600 text-[11px]/3">{authContext.user?.email}</span>
+                        <div className="flex flex-col min-w-0">
+                            <span className="text-black text-[14px] font-[500] truncate">{authContext.user?.name}</span>
+                            <span className="text-neutral-600 text-[11px]/3 truncate">{authContext.user?.email}</span>
                         </div>
                     </div>
                 </div>
