@@ -21,6 +21,7 @@ export function Button(props: ButtonProps) {
         <button
             className={`
                 rounded-full cursor-pointer w-full h-max
+                disabled:opacity-50 disabled:pointer-events-none
                 ${props.variant ? variants[props.variant] : undefined}
             `}
             disabled={props.disabled}
