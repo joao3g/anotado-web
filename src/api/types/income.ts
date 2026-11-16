@@ -8,7 +8,7 @@ export type Income = {
     id: string
     title: string
     amount: string
-    date: Date
+    date: string // UTC midnight of the first day of the month, e.g. "2026-12-01T00:00:00.000Z"
     group: {
         id: string
         title: string

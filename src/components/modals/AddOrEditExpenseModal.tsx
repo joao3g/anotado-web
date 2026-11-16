@@ -6,6 +6,7 @@ import { listCategories } from "../../api/services/category.service";
 import { createExpense, updateExpense } from "../../api/services/expense.service";
 import { PaymentMethod, type Expense } from "../../api/types/expense";
 import { useToast } from "../../hooks/useToast";
+import { amountToCents, centsToAmountString, formatMoney, inputToCents } from "../../utils";
 
 type AddOrEditExpenseModalProps = {
     onClose: React.MouseEventHandler
@@ -17,8 +18,11 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
 
     const [paymentMethod, setPaymentMethod] = useState<typeof PaymentMethod[keyof typeof PaymentMethod] | undefined>(props.data?.paymentMethod);
     const [title, setTitle] = useState(props.data?.title || "");
-    const [amount, setAmount] = useState(Number(props.data?.amount) || 0);
-    const [date, setDate] = useState(props.data?.transactionDate ? new Date(props.data.transactionDate) : new Date());
+    // Integer cents: no float math in the form.
+    const [amountCents, setAmountCents] = useState(props.data ? amountToCents(props.data.amount) : 0);
+    // "YYYY-MM-DD" string end to end: no Date object, so Brazil (UTC-3) never shifts the day.
+    // The API sends UTC midnight ("2026-12-05T00:00:00.000Z"), so the first 10 chars are the stored day.
+    const [date, setDate] = useState(props.data?.transactionDate ? props.data.transactionDate.slice(0, 10) : new Date().toLocaleDateString("en-CA"));
     const [categoryId, setCategoryId] = useState(props.data?.category.id || "");
     const [categoryOptions, setCategoryOptions] = useState<{ value: string, title: string, selected?: boolean }[]>();
     const [isEssential, setIsEssential] = useState(props.data?.isEssential || false);
@@ -32,8 +36,9 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
                 const data = {
                     title,
                     description,
-                    amount,
-                    date: date.toLocaleDateString("en-CA"),
+                    // The API takes a JSON number: "150.00" -> 150. The backend rejects anything with more than 2 decimals.
+                    amount: Number(centsToAmountString(amountCents)),
+                    date,
                     paymentMethod,
                     category: categoryId
                 };
@@ -130,15 +135,16 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
                     <Input
                         type="text"
                         label="Valor (R$)"
-                        value={amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                        onChange={(e) => { setAmount(Number(e.target.value.replace(/\D/g, "") || 0) / 100); }}
+                        inputMode="numeric"
+                        value={formatMoney(String(amountCents))}
+                        onChange={(e) => { setAmountCents(inputToCents(e.target.value)); }}
                     />
 
                     <Input
                         type="date"
                         label="Data da saída"
-                        value={date.toISOString().split("T")[0]}
-                        onChange={(e) => { setDate(new Date(e.target.value + "T00:00:00")) }}
+                        value={date}
+                        onChange={(e) => { setDate(e.target.value) }}
                     />
                 </div>
 
@@ -163,7 +169,8 @@ export function AddOrEditExpenseModal(props: AddOrEditExpenseModalProps) {
                             </span>
                         </div>
                     </div>
-                    <Slider 
+                    <Slider
+                        checked={isEssential}
                         onChange={() => setIsEssential(!isEssential)}
                     />
                 </div>
