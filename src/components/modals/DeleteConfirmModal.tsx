@@ -11,7 +11,7 @@ type ConfirmActionProps = {
 export default function Main(props: ConfirmActionProps) {
     return (
         <div className="fixed inset-0 z-900 bg-black/60 flex items-center justify-center" onClick={props.onClose}>
-            <div className="flex flex-col bg-white p-6 rounded-2xl w-md" onClick={(event) => event.stopPropagation()}>
+            <div className="flex flex-col bg-white p-6 rounded-2xl w-[calc(100%-2rem)] max-w-md max-h-[90dvh] overflow-y-auto" onClick={(event) => event.stopPropagation()}>
                 <div className="flex flex-row justify-between">
                     <div className="flex justify-center items-center size-12 rounded-full bg-red-100/50 text-red-500">
                         <TriangleAlert size={20} />

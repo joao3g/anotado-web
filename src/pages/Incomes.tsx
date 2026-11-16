@@ -8,7 +8,7 @@ import { AddOrEditIncomeModal } from '../components/modals/AddOrEditIncomeModal'
 import DeleteModal from '../components/modals/DeleteConfirmModal';
 import { deleteIncome } from '../api/services/income.service';
 import { useToast } from '../hooks/useToast';
-import { amountToCents, formatMoney } from '../utils';
+import { amountToCents, formatMoney, getOptionsPopupPosition } from '../utils';
 import { CardSkeleton } from '../components/CardSkeleton';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { useDate } from '../hooks/useDate';
@@ -49,8 +49,7 @@ export default function Main() {
     }
 
     function handleMoreOptionsButton(e: React.MouseEvent, income: Income) {
-        const calcX = e.clientX - 80;
-        const calcY = e.clientY + 20;
+        const [calcX, calcY] = getOptionsPopupPosition(e);
 
         setSelectedIncome(income);
         setMoreOptionsModalCoordinates([calcX, calcY]);
@@ -68,7 +67,7 @@ export default function Main() {
             {showMoreOptionsModal ?
                 <>
                     <div
-                        className={`fixed top-0 left-0 z-999 size-dvw bg-slate-900/2`}
+                        className={`fixed inset-0 z-999 bg-slate-900/2`}
                         onClick={() => {
                             setSelectedIncome(undefined);
                             setShowMoreOptionsModal(false);
@@ -76,7 +75,7 @@ export default function Main() {
                     />
 
                     <div
-                        className={`absolute flex flex-col rounded-3xl w-40 bg-white z-999 border-1 border-slate-200 shadow-lg`}
+                        className={`fixed flex flex-col rounded-3xl w-40 bg-white z-999 border-1 border-slate-200 shadow-lg`}
                         style={{ left: moreOptionsModalCoordinates[0], top: moreOptionsModalCoordinates[1] }}
                     >
                         <button
@@ -125,9 +124,9 @@ export default function Main() {
                 : null}
 
             <div className="flex flex-col grid-cols-3 items-center w-full">
-                <div className="flex justify-between items-center mb-4 w-full">
+                <div className="flex flex-col gap-3 md:flex-row md:justify-between md:items-center mb-4 w-full">
                     <div className="flex flex-col">
-                        <span className="text-3xl font-[600]">
+                        <span className="text-2xl md:text-3xl font-[600]">
                             Entradas
                         </span>
                         {query.isPending ?
@@ -139,7 +138,7 @@ export default function Main() {
                         }
                     </div>
 
-                    <div className="w-max">
+                    <div className="w-full md:w-max">
                         <Button
                             variant="primary"
                             onClick={() => setAddOrEditModalOpen(true)}
@@ -152,12 +151,12 @@ export default function Main() {
                     </div>
                 </div>
                 <div
-                    className="grid grid-cols-6 gap-6 w-full"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 md:gap-6 w-full"
                 >
 
                     {query.isPending ?
                         [0, 1, 2].map(index =>
-                            <div key={`income-skeleton-${index}`} className="col-span-2">
+                            <div key={`income-skeleton-${index}`} className="lg:col-span-2">
                                 <CardSkeleton>
                                     <div className="flex justify-between items-center">
                                         <LoadingSkeleton className="size-10 rounded-full" />
@@ -175,7 +174,7 @@ export default function Main() {
                         :
                         incomes?.length ?
                             incomes.map((income, index) =>
-                                <div key={`income-div-${index}`} className="col-span-2">
+                                <div key={`income-div-${index}`} className="lg:col-span-2">
                                     <CardSkeleton>
                                         <div className="flex justify-between items-center">
                                             <div className="bg-green-100 size-10 rounded-full flex justify-center items-center">
@@ -196,7 +195,7 @@ export default function Main() {
                                 </div>
                             )
                             :
-                            <div className="col-span-6">
+                            <div className="col-span-full">
                                 <CardSkeleton>
                                     <div className="flex flex-col gap-4 justify-center items-center py-12">
                                         <div className="flex items-center justify-center size-16 bg-neutral-100/60 rounded-full text-neutral-500">
@@ -205,7 +204,7 @@ export default function Main() {
 
                                         <span className="text-lg font-[600]">{`Nenhum registro em ${currentDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}`}</span>
 
-                                        <span className="text-sm text-center w-2/5">Nenhum entrada foi encontrada no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova entrada para este mês.</span>
+                                        <span className="text-sm text-center w-full md:w-2/5">Nenhum entrada foi encontrada no período selecionado. Navegue para outro mês usando o seletor na barra lateral, ou adicione uma nova entrada para este mês.</span>
                                     </div>
                                 </CardSkeleton>
                             </div>

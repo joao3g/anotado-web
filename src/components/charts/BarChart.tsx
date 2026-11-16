@@ -39,7 +39,7 @@ export function ExpensesVsIncomesBarChart(props: ExpensesVsIncomesBarChartProps)
     return (
         <div className="flex flex-col gap-4 w-full h-full justify-between">
             { props.legend ?
-                <div className="flex justify-between">
+                <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
                     <div className="flex flex-col">
                         <span className="text-lg font-[700]">
                             {props.legend.title}

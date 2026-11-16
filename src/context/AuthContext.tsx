@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState, type ReactNode } from "react"
+import { isAxiosError } from "axios"
 import { type User } from "../api/types/auth.ts"
 import { api } from "../api/services/client.ts"
 
@@ -22,13 +23,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             try {
                 const { data } = await api.get<User>("/auth/me");
                 setUser(data);
-            } catch {
-                localStorage.removeItem("token");
-                setUser(null);
+            } catch (error) {
+                // Only a rejected token (401) ends the session.
+                if (isAxiosError(error) && error.response?.status === 401) {
+                    localStorage.removeItem("token");
+                    setUser(null);
+                    return;
+                }
+
+                // No connection or server error (e.g. the installed app opened offline):
+                // keep the token and try again when the connection is back.
+                window.addEventListener("online", loadUser, { once: true });
             }
         }
 
         loadUser();
+
+        return () => window.removeEventListener("online", loadUser);
     }, []);
 
     function login(token: string, user: User) {
