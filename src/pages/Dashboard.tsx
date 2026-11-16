@@ -2,7 +2,11 @@ import { CardSkeleton } from '../components/CardSkeleton';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { ExpensesVsIncomesBarChart } from '../components/charts/BarChart';
 import type { Expense, ExpenseSummarized } from '../api/types/expense';
-import { amountToCents, formatMoney, getMonthOffset, PAYMENT_METHOD_MAP, PAYMENT_METHOD_TO_COLOR_MAP, UNCATEGORIZED_COLOR, UNCATEGORIZED_TITLE } from '../utils';
+import type { Income } from '../api/types/income';
+import { cardLabel } from '../api/types/card';
+import { amountToCents, centsToAmountString, formatMoney, getMonthAndYearString, getMonthOffset, PAYMENT_METHOD_MAP, PAYMENT_METHOD_TO_COLOR_MAP, UNCATEGORIZED_COLOR, UNCATEGORIZED_TITLE } from '../utils';
+import { downloadCsv, toCsv } from '../csv';
+import { useToast } from '../hooks/useToast';
 import { Badge } from '../components/Badge';
 import { ArrowDownRight, ArrowUpRight, CalendarOff, Minus, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -81,6 +85,51 @@ function getIncomesVsExpensesBarChartData(startDate: Date, expensesTotalCents: n
     }
 
     return data;
+}
+
+// "2026-11-03T00:00:00.000Z" -> "03/11/2026". String only: a Date object could shift the day (UTC-3).
+function formatReportDate(isoDate: string) {
+    const [year, month, day] = isoDate.slice(0, 10).split("-");
+    return `${day}/${month}/${year}`;
+}
+
+// "250.9" -> "250,90". Integer cents, decimal comma for spreadsheets in pt-BR.
+function formatReportAmount(amount: string) {
+    return centsToAmountString(amountToCents(amount)).replace(".", ",");
+}
+
+function getMonthReportRows(incomes: Income[] | undefined, expenses: Expense[] | undefined) {
+    const header = ["Tipo", "Título", "Descrição", "Categoria", "Forma de pagamento", "Cartão", "Parcela", "Data da compra", "Vencimento", "Valor (R$)"];
+
+    const incomeRows = (incomes ?? []).map(income => [
+        "Entrada",
+        income.title,
+        "", "", "", "", "", "",
+        formatReportDate(income.date),
+        formatReportAmount(income.amount)
+    ]);
+
+    // Copy before sorting: the array is the TanStack Query cache.
+    const expenseRows = [...(expenses ?? [])]
+        .sort((a, b) => a.dueDate.localeCompare(b.dueDate) || a.transactionDate.localeCompare(b.transactionDate))
+        .map(expense => [
+            "Despesa",
+            expense.title,
+            expense.description ?? "",
+            expense.category?.title ?? UNCATEGORIZED_TITLE,
+            PAYMENT_METHOD_MAP[expense.paymentMethod],
+            expense.card ? cardLabel(expense.card) : "",
+            expense.installmentNumber === null
+                ? ""
+                : expense.recurrence?.totalInstallments
+                    ? `${expense.installmentNumber}/${expense.recurrence.totalInstallments}`
+                    : String(expense.installmentNumber),
+            formatReportDate(expense.transactionDate),
+            formatReportDate(expense.dueDate),
+            formatReportAmount(expense.amount)
+        ]);
+
+    return [header, ...incomeRows, ...expenseRows];
 }
 
 function DashboardSkeleton() {
@@ -172,6 +221,7 @@ function DashboardSkeleton() {
 
 export default function Main() {
     const authContext = useAuth();
+    const { addToast } = useToast();
 
     const { currentDate } = useDate();
 
@@ -226,6 +276,19 @@ export default function Main() {
     const expensesByCategoryPieData = getExpensesByCategoryPieData(data.expensesSummarized);
     const expensesByPaymentMethod = getExpensesByPaymentMethodPieData(data.expensesSummarized);
     const incomesVsExpensesBarChartData = getIncomesVsExpensesBarChartData(new Date(currentDate), data.expensesTotalCents, data.incomesTotalCents);
+
+    const hasMonthData = Boolean(data.incomes?.length || data.expenses?.length);
+
+    function handleExportReport() {
+        try {
+            const rows = getMonthReportRows(data.incomes, data.expenses);
+            downloadCsv(`relatorio-${getMonthAndYearString(currentDate)}.csv`, toCsv(rows));
+            addToast("Relatório exportado!", "success");
+        } catch (error) {
+            console.error("[handleExportReport]: ", error);
+            addToast("Falha ao exportar o relatório!", "error");
+        }
+    }
 
     function handleGreeting() {
         const now = new Date();
@@ -308,7 +371,7 @@ export default function Main() {
 
                 <div className="flex gap-2">
                     <div className="w-[180px]">
-                        <Button variant="secondary" onClick={() => console.log("Função não implementada")} >Exportar relatório</Button>
+                        <Button variant="secondary" onClick={handleExportReport} disabled={isLoading || !hasMonthData}>Exportar relatório</Button>
                     </div>
                 </div>
             </div>
