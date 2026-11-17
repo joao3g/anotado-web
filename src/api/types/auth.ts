@@ -1,3 +1,5 @@
+import type { FamilyRole } from "./group";
+
 export type User = {
     login: string
     name: string
@@ -8,6 +10,7 @@ export type User = {
     group: {
         title: string
         totalMembers: number
+        role: FamilyRole
     } | null
 }
 

@@ -1,4 +1,4 @@
-import type { Family } from "../types/group";
+import type { Family, FamilyRole } from "../types/group";
 import { api } from "./client";
 
 export const getFamily = async () => {
@@ -16,6 +16,16 @@ export const regenerateInviteCode = async () => {
     const { data } = await api.post<{ inviteCode: string }>("/group/me/invite-code");
 
     return data.inviteCode;
+};
+
+// Admin only (the API answers 403 otherwise).
+export const removeMember = async (id: string) => {
+    await api.delete(`/group/me/members/${encodeURIComponent(id)}`);
+};
+
+// Admin only. Makes another person an admin, or an admin back a member.
+export const setMemberRole = async (id: string, role: FamilyRole) => {
+    await api.patch(`/group/me/members/${encodeURIComponent(id)}/role`, { role });
 };
 
 export const leaveFamily = async () => {
