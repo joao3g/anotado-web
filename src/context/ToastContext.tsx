@@ -1,7 +1,10 @@
-import { createContext, useState, type ReactNode } from "react";
+import { createContext, useRef, useState, type ReactNode } from "react";
+import { CircleCheck, CircleX, Info, X } from "lucide-react";
+
+type ToastType = "info" | "error" | "success";
 
 type ToastContextType = {
-    addToast: (message: string, type?: "info" | "error" | "success") => void
+    addToast: (message: string, type?: ToastType) => void
 }
 
 export const ToastContext = createContext<ToastContextType | null>(null);
@@ -9,54 +12,90 @@ export const ToastContext = createContext<ToastContextType | null>(null);
 type Toast = {
     id: number
     message: string
-    type: "info" | "error" | "success"
+    type: ToastType
+    duration: number // ms
     isLeaving?: boolean
 }
 
+// Errors stay longer: they usually say what to do next.
+const DURATION: Record<ToastType, number> = { success: 3500, info: 3500, error: 5000 };
+const LEAVE_ANIMATION_MS = 300;
+const MAX_VISIBLE = 3;
+
+const STYLES: Record<ToastType, { icon: typeof Info, iconClass: string, barClass: string }> = {
+    success: { icon: CircleCheck, iconClass: "bg-green-100 text-green-700", barClass: "bg-green-500" },
+    error: { icon: CircleX, iconClass: "bg-red-100 text-red-600", barClass: "bg-red-500" },
+    info: { icon: Info, iconClass: "bg-teal-100 text-teal-700", barClass: "bg-teal-500" },
+};
+
 export function ToastProvider({ children }: { children: ReactNode }) {
-    const [toasts, setToasts] = useState<Toast[]>();
+    const [toasts, setToasts] = useState<Toast[]>([]);
+    // Unique id even for two toasts in the same millisecond
+    const nextId = useRef(1);
 
-    const acceptableToastTypesColorMap = {
-        info: "bg-teal-500 border-teal-600 border-2",
-        error: "bg-red-400",
-        success: "bg-green-400"
-    };
+    function dismiss(id: number) {
+        setToasts(prev => prev.map(t => t.id === id ? { ...t, isLeaving: true } : t));
+        setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), LEAVE_ANIMATION_MS);
+    }
 
-    function addToast(message: string, type: "info" | "error" | "success" = "info") {
-        const id = Date.now();
+    function addToast(message: string, type: ToastType = "info") {
+        const id = nextId.current++;
+        const duration = DURATION[type];
 
-        setToasts((prev) => prev ? [...prev, { id, message, type }] : [{ id, message, type }]);
+        // Newest at the bottom; keep at most MAX_VISIBLE
+        setToasts(prev => [...prev, { id, message, type, duration }].slice(-MAX_VISIBLE));
 
-        setTimeout(() => {
-            setToasts((prev) =>
-                prev?.map((t) =>
-                    t.id === id ? { ...t, isLeaving: true } : t
-                )
-            );
-        }, 3000);
-
-        setTimeout(() => {
-            setToasts((prev) => prev?.filter(t => t.id !== id));
-        }, 3500);
+        setTimeout(() => dismiss(id), duration);
     }
 
     return (
         <ToastContext.Provider value={{ addToast }}>
             {children}
 
-            <div className="fixed top-[calc(1rem+env(safe-area-inset-top))] right-4 max-w-[calc(100%-2rem)] flex z-999 flex-col gap-2">
-                {toasts?.map(t => (
-                    <div
-                        key={t.id}
-                        className={`
-                            px-6 py-4 rounded text-white transition-all duration-500
-                            ${acceptableToastTypesColorMap[t.type]}
-                            ${t.isLeaving ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}
-                        `}
-                    >
-                        {t.message}
-                    </div>
-                ))}
+            {/* Phones: full width at the top (below the notch). From sm: top-right, fixed width. */}
+            <div
+                aria-live="polite"
+                className="fixed z-999 top-[calc(0.75rem+env(safe-area-inset-top))] left-3 right-3 sm:left-auto sm:right-4 sm:w-96 flex flex-col gap-2 pointer-events-none"
+            >
+                {toasts.map(t => {
+                    const style = STYLES[t.type];
+                    const Icon = style.icon;
+
+                    return (
+                        <div
+                            key={t.id}
+                            role={t.type === "error" ? "alert" : "status"}
+                            className={`
+                                pointer-events-auto relative overflow-hidden flex items-start gap-3 p-3 pr-2
+                                bg-white border-1 border-slate-200 rounded-2xl shadow-lg animate-toast-in
+                                transition-all duration-300
+                                ${t.isLeaving ? "opacity-0 -translate-y-2" : "opacity-100 translate-y-0"}
+                            `}
+                        >
+                            <div className={`flex justify-center items-center shrink-0 size-8 rounded-full ${style.iconClass}`}>
+                                <Icon size={18} />
+                            </div>
+
+                            <span className="flex-1 min-w-0 self-center text-sm font-[500] text-neutral-800 break-words">
+                                {t.message}
+                            </span>
+
+                            <button
+                                aria-label="Fechar aviso"
+                                className="flex justify-center items-center shrink-0 size-7 rounded-full text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 cursor-pointer"
+                                onClick={() => dismiss(t.id)}
+                            >
+                                <X size={16} />
+                            </button>
+
+                            {/* Time left */}
+                            <div
+                                className={`absolute left-0 bottom-0 h-0.5 w-full origin-left animate-toast-progress ${style.barClass}`}
+                                style={{ animationDuration: `${t.duration}ms` }}
+                            />
+                        </div>
+                    );
+                })}
             </div>
         </ToastContext.Provider>
     );
