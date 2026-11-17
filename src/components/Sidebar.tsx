@@ -35,9 +35,12 @@ type SidebarProps = {
     // Drawer state on small screens (< lg). On lg and up the sidebar is always visible.
     open: boolean
     onClose: () => void
+    // Used by the swipe gesture (useDrawerSwipe) to move them while dragging
+    navRef?: React.Ref<HTMLElement>
+    backdropRef?: React.Ref<HTMLDivElement>
 }
 
-export function Sidebar(props: SidebarProps) {
+export function Sidebar({ navRef, backdropRef, ...props }: SidebarProps) {
     const [expenseModalOpen, setExpenseModalOpen] = useState(false);
 
     const authContext = useAuth();
@@ -79,10 +82,13 @@ export function Sidebar(props: SidebarProps) {
                 />
                 : null}
 
-            {/* Mobile only: backdrop that closes the drawer */}
-            {props.open ?
-                <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={props.onClose} />
-                : null}
+            {/* Mobile only: backdrop that closes the drawer. Always rendered (invisible and click-through
+                when closed) so it can fade in while the drawer is dragged open. */}
+            <div
+                ref={backdropRef}
+                className={`lg:hidden fixed inset-0 z-40 bg-black/40 transition-opacity duration-200 ${props.open ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                onClick={props.onClose}
+            />
 
             {/* Mobile only: floating "add expense" button */}
             <button
@@ -94,6 +100,7 @@ export function Sidebar(props: SidebarProps) {
             </button>
 
             <nav
+                ref={navRef}
                 className={`fixed inset-y-0 left-0 z-50 flex flex-col justify-between items-center w-70 h-dvh overflow-y-auto bg-white border-r-1 border-slate-200 transition-transform duration-200 lg:translate-x-0 ${props.open ? "translate-x-0" : "-translate-x-full"}`}
             >
                 <div className="w-full">
