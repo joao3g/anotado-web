@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { Copy, LogOut, RefreshCw, ShieldCheck, ShieldOff, UserMinus } from 'lucide-react';
+import { Copy, Ellipsis, LogOut, RefreshCw, ShieldCheck, ShieldOff, UserMinus } from 'lucide-react';
 import { Avatar } from '../../components/Avatar';
 import { Badge } from '../../components/Badge';
 import { Button } from '../../components/Button';
@@ -101,10 +101,80 @@ function MemberActionButton(props: { onClick: () => void, children: React.ReactN
     );
 }
 
+function MemberInfo(props: { member: FamilyMember }) {
+    return (
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+            <Avatar name={props.member.name} avatar={props.member.avatar} />
+            <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-[600] truncate">{props.member.name ?? "Sem nome"}</span>
+                    {props.member.role === "ADMIN" ? <Badge variant="info">Admin</Badge> : null}
+                    {props.member.isMe ? <Badge variant="success">Você</Badge> : null}
+                </div>
+                <span className="text-xs text-neutral-600 truncate">{props.member.email}</span>
+            </div>
+        </div>
+    );
+}
+
+// Phones: the admin actions on a member, in a popup from the bottom (the row has no room for buttons).
+// Closes on a tap outside, on Esc, and after choosing an option (which then asks for confirmation).
+function MemberOptionsSheet(props: { member: FamilyMember, onChoose: (action: MemberAction) => void, onClose: () => void }) {
+    const { onClose } = props;
+
+    useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === "Escape") onClose();
+        }
+
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [onClose]);
+
+    const itemClass = "flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm font-[500] cursor-pointer";
+
+    return (
+        <div className="fixed inset-0 z-900 bg-black/60 flex items-end justify-center" onClick={props.onClose}>
+            <div
+                role="menu"
+                aria-label={`Opções de ${props.member.name ?? "Sem nome"}`}
+                className="w-full max-w-md overflow-hidden bg-white rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
+                onClick={(event) => event.stopPropagation()}
+            >
+                <div className="flex p-4 bg-linear-to-t from-green-50 to-white">
+                    <MemberInfo member={props.member} />
+                </div>
+
+                <div className="flex flex-col p-1.5 border-t-1 border-slate-200">
+                    {props.member.role === "MEMBER" ?
+                        <button role="menuitem" type="button" className={`${itemClass} text-neutral-700 hover:bg-neutral-100`} onClick={() => props.onChoose("PROMOTE")}>
+                            <ShieldCheck size={16} />Tornar admin
+                        </button>
+                        :
+                        <button role="menuitem" type="button" className={`${itemClass} text-neutral-700 hover:bg-neutral-100`} onClick={() => props.onChoose("DEMOTE")}>
+                            <ShieldOff size={16} />Tirar admin
+                        </button>
+                    }
+                    <button role="menuitem" type="button" className={`${itemClass} text-red-600 hover:bg-red-50`} onClick={() => props.onChoose("REMOVE")}>
+                        <UserMinus size={16} />Remover da família
+                    </button>
+                </div>
+
+                <div className="p-1.5 border-t-1 border-slate-200">
+                    <button type="button" className={`${itemClass} justify-center text-neutral-600 hover:bg-neutral-100`} onClick={props.onClose}>
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function MembersCard(props: { family: Family, isAdmin: boolean }) {
     const authContext = useAuth();
     const { addToast } = useToast();
     const [pending, setPending] = useState<{ action: MemberAction, member: FamilyMember } | null>(null);
+    const [sheetMember, setSheetMember] = useState<FamilyMember | null>(null);
 
     const memberName = (member: FamilyMember) => member.name ?? "Sem nome";
 
@@ -133,6 +203,17 @@ function MembersCard(props: { family: Family, isAdmin: boolean }) {
 
     return (
         <>
+            {sheetMember ?
+                <MemberOptionsSheet
+                    member={sheetMember}
+                    onChoose={(action) => {
+                        setSheetMember(null);
+                        setPending({ action, member: sheetMember });
+                    }}
+                    onClose={() => setSheetMember(null)}
+                />
+                : null}
+
             {pending && pendingTexts ?
                 <ConfirmModal
                     title={pendingTexts.title}
@@ -151,39 +232,45 @@ function MembersCard(props: { family: Family, isAdmin: boolean }) {
                     </span>
                 </div>
 
-                {props.family.members.map((member) => (
-                    <div key={member.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3 px-6 border-b-1 border-slate-200 last:border-0 last:pb-0">
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <Avatar name={member.name} avatar={member.avatar} />
-                            <div className="flex flex-col min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="text-sm font-[600] truncate">{memberName(member)}</span>
-                                    {member.role === "ADMIN" ? <Badge variant="info">Admin</Badge> : null}
-                                    {member.isMe ? <Badge variant="success">Você</Badge> : null}
-                                </div>
-                                <span className="text-xs text-neutral-600 truncate">{member.email}</span>
-                            </div>
-                        </div>
+                {props.family.members.map((member) => {
+                    // Admins manage the others. To leave, an admin uses "Sair da família".
+                    const canManage = props.isAdmin && !member.isMe;
 
-                        {/* Admins manage the others. To leave, an admin uses "Sair da família". */}
-                        {props.isAdmin && !member.isMe ?
-                            <div className="flex gap-2 ml-auto">
-                                {member.role === "MEMBER" ?
-                                    <MemberActionButton onClick={() => setPending({ action: "PROMOTE", member })}>
-                                        <ShieldCheck size={14} />Tornar admin
-                                    </MemberActionButton>
-                                    :
-                                    <MemberActionButton onClick={() => setPending({ action: "DEMOTE", member })}>
-                                        <ShieldOff size={14} />Tirar admin
-                                    </MemberActionButton>
-                                }
-                                <MemberActionButton onClick={() => setPending({ action: "REMOVE", member })}>
-                                    <span className="flex items-center gap-1.5 text-red-600"><UserMinus size={14} />Remover</span>
-                                </MemberActionButton>
-                            </div>
-                            : null}
-                    </div>
-                ))}
+                    return (
+                        <div key={member.id} className="relative flex items-center gap-3 py-3 px-6 border-b-1 border-slate-200 last:border-0 last:pb-0">
+                            <MemberInfo member={member} />
+
+                            {canManage ?
+                                <>
+                                    {/* Phones: the whole row opens the options popup. */}
+                                    <button
+                                        type="button"
+                                        aria-label={`Opções de ${memberName(member)}`}
+                                        className="absolute inset-0 cursor-pointer sm:hidden"
+                                        onClick={() => setSheetMember(member)}
+                                    />
+                                    <Ellipsis size={16} className="shrink-0 text-neutral-600 sm:hidden" aria-hidden="true" />
+
+                                    {/* Larger screens: the buttons fit in the row. */}
+                                    <div className="hidden sm:flex gap-2 ml-auto">
+                                        {member.role === "MEMBER" ?
+                                            <MemberActionButton onClick={() => setPending({ action: "PROMOTE", member })}>
+                                                <ShieldCheck size={14} />Tornar admin
+                                            </MemberActionButton>
+                                            :
+                                            <MemberActionButton onClick={() => setPending({ action: "DEMOTE", member })}>
+                                                <ShieldOff size={14} />Tirar admin
+                                            </MemberActionButton>
+                                        }
+                                        <MemberActionButton onClick={() => setPending({ action: "REMOVE", member })}>
+                                            <span className="flex items-center gap-1.5 text-red-600"><UserMinus size={14} />Remover</span>
+                                        </MemberActionButton>
+                                    </div>
+                                </>
+                                : null}
+                        </div>
+                    );
+                })}
             </CardSkeleton>
         </>
     );
