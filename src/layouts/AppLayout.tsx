@@ -1,20 +1,32 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Navigate, Outlet } from "react-router";
 import { Sidebar } from "../components/Sidebar";
 import { MobileTopBar } from "../components/MobileTopBar";
 import { useAuth } from "../hooks/useAuth";
+import { useDrawerSwipe } from "../hooks/useDrawerSwipe";
 
 export default function AppLayout() {
   // Sidebar drawer on small screens (< lg)
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { user } = useAuth();
 
+  // Phones/tablets: swipe right opens the drawer, swipe left closes it
+  const navRef = useRef<HTMLElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  useDrawerSwipe({
+    open: drawerOpen,
+    onOpen: () => setDrawerOpen(true),
+    onClose: () => setDrawerOpen(false),
+    drawerRef: navRef,
+    backdropRef,
+  });
+
   // Logged in without a family: choose or create one first.
   if (user && user.group === null) return <Navigate to="/onboarding" replace />;
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <Sidebar open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <Sidebar open={drawerOpen} onClose={() => setDrawerOpen(false)} navRef={navRef} backdropRef={backdropRef} />
 
       <div className="flex flex-col flex-1 min-w-0 lg:ml-70">
         <MobileTopBar onMenuClick={() => setDrawerOpen(true)} />
