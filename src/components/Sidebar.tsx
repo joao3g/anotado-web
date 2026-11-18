@@ -107,7 +107,7 @@ export function Sidebar({ navRef, backdropRef, ...props }: SidebarProps) {
                     <div className="flex justify-start items-center gap-2 px-6 h-20 w-full mt-[env(safe-area-inset-top)]">
                         <Icon size={20} />
                         <div className="flex flex-col">
-                            <span className="text-black text-[16px] font-[600]">Expense Tracker</span>
+                            <span className="text-black text-[16px] font-[600]">Anotado</span>
                             <span className="text-neutral-600 text-[11px]/3">Pro</span>
                         </div>
                     </div>

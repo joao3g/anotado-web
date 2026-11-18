@@ -2,7 +2,7 @@
 // It caches ONLY this site's own static files (the HTML shell and the Vite JS/CSS bundles).
 // API calls go to another origin (VITE_API_BASE_URL) and are never handled here,
 // so money data and the login token never go into this cache.
-const CACHE = "expense-tracker-v1";
+const CACHE = "anotado-v1"; // A new name makes "activate" delete the old cache
 const MAX_ASSETS = 40; // Old bundles from past deploys are removed after this many
 
 self.addEventListener("install", (event) => {

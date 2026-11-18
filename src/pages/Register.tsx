@@ -58,7 +58,7 @@ export default function RegisterPage() {
             <form className="flex flex-col justify-center w-full max-w-100 px-4 items-center gap-y-5" onSubmit={handleSubmit}>
                 <div className="flex w-full items-center gap-3 mb-6">
                     <Icon size={20} />
-                    <span className="font-[600] text-md">Expense Tracker</span>
+                    <span className="font-[600] text-md">Anotado</span>
                 </div>
 
                 <div className="flex flex-col w-full">

@@ -1,6 +1,6 @@
 <<<<<<< HEAD
-# expense-tracker-web
-Web interface for the Expense Tracker application built with React.
+# anotado-web
+Web interface for the Anotado application built with React.
 =======
 # React + TypeScript + Vite
 

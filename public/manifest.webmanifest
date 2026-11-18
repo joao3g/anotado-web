@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Expense Tracker",
-  "short_name": "Expense Tracker",
+  "name": "Anotado",
+  "short_name": "Anotado",
   "description": "Finanças pessoais e compartilhadas com a família.",
   "lang": "pt-BR",
   "start_url": "/dashboard",

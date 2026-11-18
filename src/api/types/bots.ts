@@ -11,13 +11,13 @@ export type BotsStatus = {
     telegram: {
         enabled: boolean
         connected: boolean
-        botUsername: string | null // e.g. "ExpenseTrackerFamiliaBot" (without @)
+        botUsername: string | null // e.g. "AnotadoBot" (without @)
     }
 }
 
 // One code links either bot. Valid for 10 minutes and only once.
 export type BotLinkCode = {
-    code: string // "ET-K7MZQ2PA"
+    code: string // "AN-K7MZQ2PA"
     expiresAt: string // ISO date-time
     whatsapp: { message: string, link: string | null } | null // Text to send, and a wa.me link with it typed
     telegram: { link: string } | null // t.me link: tapping "Start" sends the code
