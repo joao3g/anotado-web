@@ -14,7 +14,7 @@ import { useToast } from '../../hooks/useToast';
 import { queryClient } from '../../queryClient';
 import { fileToAvatarDataUrl } from '../../image';
 import { formatPhone } from '../../utils';
-import { WhatsappCard } from './WhatsappCard';
+import { BotsCard } from './BotsCard';
 
 function PhotoCard(props: { user: User }) {
     const authContext = useAuth();
@@ -197,7 +197,7 @@ export default function ProfileTab() {
             <PhotoCard user={user} />
             {/* key: reset the form when the saved profile changes */}
             <PersonalInfoCard key={`${user.name}|${user.email}|${user.phone}`} user={user} />
-            <WhatsappCard />
+            <BotsCard />
         </div>
     );
 }
