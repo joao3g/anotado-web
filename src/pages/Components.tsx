@@ -22,7 +22,7 @@ export default function Main() {
     return (
         <div className="flex flex-col gap-5 m-10">
             <div className="flex gap-3">
-                <Icon size={20} />
+                <Icon />
             </div>
 
             <div className="flex gap-3">

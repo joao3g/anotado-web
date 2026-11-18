@@ -71,7 +71,7 @@ export default function OnboardingPage() {
             <div className="flex flex-col w-full max-w-3xl gap-6">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <Icon size={20} />
+                        <Icon />
                         <span className="font-[600] text-md">Anotado</span>
                     </div>
 
