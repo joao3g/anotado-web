@@ -72,7 +72,7 @@ export default function OnboardingPage() {
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <Icon size={20} />
-                        <span className="font-[600] text-md">Expense Tracker</span>
+                        <span className="font-[600] text-md">Anotado</span>
                     </div>
 
                     <button className="flex items-center gap-2 text-sm text-neutral-600 hover:text-black cursor-pointer" onClick={logout}>
