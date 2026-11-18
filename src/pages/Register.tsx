@@ -79,7 +79,7 @@ export default function RegisterPage() {
                 </div>
 
                 <span className="text-neutral-600 text-xs">
-                    Já tem conta? <span className="text-green-700 font-bold cursor-pointer" onClick={() => navigate("/")}>Fazer login</span>
+                    Já tem conta? <span className="text-brand font-bold cursor-pointer" onClick={() => navigate("/")}>Fazer login</span>
                 </span>
             </form>
         </div>

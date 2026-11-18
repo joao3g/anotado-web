@@ -57,7 +57,7 @@ function RecurrencesSkeleton() {
 function FilterButton(props: { selected: boolean, onClick: () => void, children: React.ReactNode }) {
     return (
         <button
-            className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer ${props.selected ? "bg-green-900/10 text-emerald-900" : "bg-gray-100 text-gray-700 hover:bg-green-50"}`}
+            className={`px-3 py-1 rounded-full text-xs font-bold cursor-pointer ${props.selected ? "bg-brand/10 text-brand" : "bg-gray-100 text-gray-700 hover:bg-brand/5"}`}
             onClick={props.onClick}
         >
             {props.children}

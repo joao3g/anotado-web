@@ -22,7 +22,7 @@ export default function SettingsPage() {
                         key={tab.path}
                         to={tab.path}
                         className={({ isActive }) =>
-                            `flex items-center gap-2 shrink-0 px-4 py-2 rounded-full text-sm font-[600] ${isActive ? "bg-green-900/10 text-emerald-900" : "bg-white text-neutral-600 border-1 border-slate-200 hover:bg-green-50"}`
+                            `flex items-center gap-2 shrink-0 px-4 py-2 rounded-full text-sm font-[600] ${isActive ? "bg-brand/10 text-brand" : "bg-white text-neutral-600 border-1 border-slate-200 hover:bg-brand/5"}`
                         }
                     >
                         <tab.icon size={16} />

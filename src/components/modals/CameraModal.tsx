@@ -146,7 +146,7 @@ export function CameraModal(props: CameraModalProps) {
                         <div className="size-12" />
                         <button
                             aria-label="Capturar foto"
-                            className="flex justify-center items-center size-18 rounded-full bg-white text-black border-4 border-white/40 bg-clip-padding cursor-pointer disabled:opacity-40"
+                            className="flex justify-center items-center size-18 rounded-full bg-white text-ink border-4 border-white/40 bg-clip-padding cursor-pointer disabled:opacity-40"
                             disabled={!live}
                             onClick={capture}
                         >

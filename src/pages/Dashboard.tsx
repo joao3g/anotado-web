@@ -422,8 +422,8 @@ export default function Main() {
                                 <div className="md:col-span-2">
                                     <CardSkeleton>
                                         <div className="flex justify-between items-center">
-                                            <div className="bg-teal-100 size-10 rounded-full flex justify-center items-center">
-                                                <Wallet size={20} className="text-teal-900" />
+                                            <div className="bg-brand/10 size-10 rounded-full flex justify-center items-center">
+                                                <Wallet size={20} className="text-brand" />
                                             </div>
 
                                             {renderBadge(

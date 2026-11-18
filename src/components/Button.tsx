@@ -12,8 +12,8 @@ export type ButtonProps = {
 }
 
 const variants = {
-    primary: "px-4 py-2 text-white bg-linear-to-r from-green-600/90 via-emerald-700/90 via-60% to-emerald-700 hover:opacity-95 font-normal text-md shadow-emerald-100 shadow-lg",
-    secondary: "px-4 py-2 text-black bg-white font-normal text-sm shadow-black-100 shadow-sm/20 inset-shadow-sm hover:text-green-900 hover:bg-green-100",
+    primary: "px-4 py-2 text-brand-cream bg-brand hover:opacity-95 font-normal text-md shadow-brand/15 shadow-lg",
+    secondary: "px-4 py-2 text-ink bg-white font-normal text-sm shadow-black-100 shadow-sm/20 inset-shadow-sm hover:text-brand hover:bg-brand/10",
     danger: "px-4 py-2 text-white bg-red-500 text-sm hover:opacity-80"
 }
 

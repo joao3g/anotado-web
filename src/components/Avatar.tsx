@@ -28,8 +28,8 @@ export function Avatar(props: AvatarProps) {
     }
 
     return (
-        <div className={`${className} shrink-0 flex justify-center items-center rounded-full bg-linear-120 from-emerald-600 from-30% to-teal-500`}>
-            <span className="font-[700] text-white/80">{getInitials(props.name)}</span>
+        <div className={`${className} shrink-0 flex justify-center items-center rounded-full bg-brand`}>
+            <span className="font-[700] text-brand-cream">{getInitials(props.name)}</span>
         </div>
     );
 }

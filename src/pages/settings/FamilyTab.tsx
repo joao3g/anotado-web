@@ -141,7 +141,7 @@ function MemberOptionsSheet(props: { member: FamilyMember, onChoose: (action: Me
                 className="w-full max-w-md overflow-hidden bg-white rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
                 onClick={(event) => event.stopPropagation()}
             >
-                <div className="flex p-4 bg-linear-to-t from-green-50 to-white">
+                <div className="flex p-4 bg-linear-to-t from-brand/5 to-white">
                     <MemberInfo member={props.member} />
                 </div>
 

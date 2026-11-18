@@ -23,7 +23,7 @@ import { AccountMenu } from "./AccountMenu";
 function SidebarButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
     return (
         <button
-            className="px-4 py-2 text-neutral-600 font-[400] bg-transparent hover:text-black hover:bg-neutral-100/70 disabled:bg-green-900/10 disabled:text-emerald-900 rounded-full cursor-pointer w-full"
+            className="px-4 py-2 text-neutral-600 font-[400] bg-transparent hover:text-ink hover:bg-neutral-100/70 disabled:bg-brand/10 disabled:text-brand rounded-full cursor-pointer w-full"
             {...props}
         >
             {props.children}
@@ -93,7 +93,7 @@ export function Sidebar({ navRef, backdropRef, ...props }: SidebarProps) {
             {/* Mobile only: floating "add expense" button */}
             <button
                 aria-label="Adicionar despesa"
-                className="lg:hidden fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 flex justify-center items-center size-14 rounded-full cursor-pointer text-white bg-linear-to-r from-green-600/90 via-emerald-700/90 via-60% to-emerald-700 shadow-emerald-200 shadow-lg"
+                className="lg:hidden fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 flex justify-center items-center size-14 rounded-full cursor-pointer text-brand-cream bg-brand shadow-brand/25 shadow-lg"
                 onClick={openExpenseModal}
             >
                 <Plus size={24} strokeWidth={2.5} />
@@ -107,7 +107,7 @@ export function Sidebar({ navRef, backdropRef, ...props }: SidebarProps) {
                     <div className="flex justify-start items-center gap-2 px-6 h-20 w-full mt-[env(safe-area-inset-top)]">
                         <Icon />
                         <div className="flex flex-col">
-                            <span className="text-black text-[16px] font-[600]">Anotado</span>
+                            <span className="text-ink text-[16px] font-[600]">Anotado</span>
                             <span className="text-neutral-600 text-[11px]/3">Pro</span>
                         </div>
                     </div>
@@ -173,13 +173,13 @@ export function Sidebar({ navRef, backdropRef, ...props }: SidebarProps) {
                 </div>
 
                 <div className="w-full">
-                    <div className="flex gap-2 m-4 p-4 border-1 border-slate-200 rounded-2xl bg-emerald-100/20">
-                        <div className="flex justify-center items-center rounded-full size-8 bg-teal-300/50 text-teal-500">
+                    <div className="flex gap-2 m-4 p-4 border-1 border-slate-200 rounded-2xl bg-brand/5">
+                        <div className="flex justify-center items-center rounded-full size-8 bg-brand/10 text-brand">
                             <Users size={16} />
                         </div>
 
                         <div className="flex flex-col">
-                            <span className="text-black text-[12px] font-[500]">{authContext.user?.group?.title}</span>
+                            <span className="text-ink text-[12px] font-[500]">{authContext.user?.group?.title}</span>
                             <span className="text-neutral-600 text-[9px]/3">{authContext.user?.group?.totalMembers} membro{authContext.user?.group?.totalMembers === 1 ? "" : "s"}</span>
                         </div>
                     </div>

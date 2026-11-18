@@ -240,7 +240,7 @@ export function AddOrEditRecurrenceModal(props: AddOrEditRecurrenceModalProps) {
                 }
 
                 {amountCents > 0 ?
-                    <div className="px-4 py-3 bg-green-50 border-1 border-green-200 rounded-3xl text-sm text-emerald-900">
+                    <div className="px-4 py-3 bg-brand/5 border-1 border-brand/20 rounded-3xl text-sm text-brand">
                         {isEdit || !endsAfterCount ?
                             `${formatMoney(String(amountCents))} por mês${!isEdit ? ", sem data para terminar" : ""}`
                             : installmentsValid ?
