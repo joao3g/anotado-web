@@ -53,13 +53,13 @@ export function AccountMenu(props: AccountMenuProps) {
                     aria-label="Opções da conta"
                     className="absolute bottom-full left-3 right-3 mb-2 z-10 overflow-hidden bg-white border-1 border-slate-200 rounded-2xl shadow-lg"
                 >
-                    <div className="flex items-center gap-3 p-4 bg-linear-to-t from-green-50 to-white">
+                    <div className="flex items-center gap-3 p-4 bg-linear-to-t from-brand/5 to-white">
                         <Avatar name={user?.name} avatar={user?.avatar} />
                         <div className="flex flex-col min-w-0">
-                            <span className="text-sm font-[600] text-black truncate">{user?.name}</span>
+                            <span className="text-sm font-[600] text-ink truncate">{user?.name}</span>
                             <span className="text-xs text-neutral-600 truncate">{user?.email}</span>
                             {user?.group ?
-                                <span className="flex items-center gap-1 mt-0.5 text-[11px] text-emerald-800 truncate">
+                                <span className="flex items-center gap-1 mt-0.5 text-[11px] text-brand truncate">
                                     <Users size={12} className="shrink-0" />
                                     {user.group.title}
                                 </span>
@@ -70,7 +70,7 @@ export function AccountMenu(props: AccountMenuProps) {
                     <div className="p-1.5 border-t-1 border-slate-200">
                         <button
                             role="menuitem"
-                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-[500] text-neutral-700 hover:bg-neutral-100 hover:text-black cursor-pointer"
+                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-[500] text-neutral-700 hover:bg-neutral-100 hover:text-ink cursor-pointer"
                             onClick={goToSettings}
                         >
                             <Settings size={16} />
@@ -100,7 +100,7 @@ export function AccountMenu(props: AccountMenuProps) {
             >
                 <Avatar name={user?.name} avatar={user?.avatar} />
                 <div className="flex flex-col flex-1 min-w-0">
-                    <span className="text-black text-[14px] font-[500] truncate">{user?.name}</span>
+                    <span className="text-ink text-[14px] font-[500] truncate">{user?.name}</span>
                     <span className="text-neutral-600 text-[11px]/3 truncate">{user?.email}</span>
                 </div>
                 <ChevronsUpDown size={16} className="shrink-0 text-neutral-500" />

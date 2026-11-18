@@ -25,7 +25,7 @@ const MAX_VISIBLE = 3;
 const STYLES: Record<ToastType, { icon: typeof Info, iconClass: string, barClass: string }> = {
     success: { icon: CircleCheck, iconClass: "bg-green-100 text-green-700", barClass: "bg-green-500" },
     error: { icon: CircleX, iconClass: "bg-red-100 text-red-600", barClass: "bg-red-500" },
-    info: { icon: Info, iconClass: "bg-teal-100 text-teal-700", barClass: "bg-teal-500" },
+    info: { icon: Info, iconClass: "bg-brand/10 text-brand", barClass: "bg-brand" },
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {

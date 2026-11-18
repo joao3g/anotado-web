@@ -1,4 +1,4 @@
-import { CreditCard, Tag, Wallet } from "lucide-react";
+import { CreditCard, Tag } from "lucide-react";
 import { hexToHsl } from "../utils";
 
 function getIconColor(color: string) {
@@ -7,14 +7,9 @@ function getIconColor(color: string) {
     return `hsl(${h},${Math.min(s + 10, 100)}%,20%)`;
 }
 
-export function Icon(props: { size: number }) {
-    return (
-        <div
-            className={`inline-flex items-center justify-center rounded-full size-9 text-xs font-medium bg-linear-300 from-emerald-800/70 to-green-600/90 text-white shadow-green-600/20 shadow-lg`}
-        >
-            <Wallet size={props.size} strokeWidth={2.3} />
-        </div>
-    )
+// App logo. Decorative: the "Anotado" name is always shown next to it.
+export function Icon() {
+    return <img src="/icons/icon-192.png" alt="" className="size-9 shrink-0" />;
 }
 
 export function CategoryIcon(props: { color: string }) {

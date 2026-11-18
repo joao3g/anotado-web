@@ -34,7 +34,7 @@ function Main() {
             <div className="flex flex-1 justify-center">
                 <div className="flex flex-col justify-center w-full max-w-100 px-4 items-center gap-y-5">
                     <div className="flex w-full items-center gap-3 mb-6">
-                        <Icon size={20} />
+                        <Icon />
                         <span className="font-[600] text-md">Anotado</span>
                     </div>
 
@@ -68,10 +68,10 @@ function Main() {
                         </Button>
                     </div>
 
-                    <span className="text-neutral-600 text-xs">Ainda não tem conta? <span className="text-green-700 font-bold cursor-pointer" onClick={() => navigate("/register")}>Criar conta</span></span>
+                    <span className="text-neutral-600 text-xs">Ainda não tem conta? <span className="text-brand font-bold cursor-pointer" onClick={() => navigate("/register")}>Criar conta</span></span>
                 </div>
             </div>
-            <div className="hidden lg:flex flex-1 justify-center bg-radial-[at_0%_90%] from-transparent from-10% via-green-600/12 to-transparent to-90% h-screen">
+            <div className="hidden lg:flex flex-1 justify-center bg-radial-[at_0%_90%] from-transparent from-10% via-brand/12 to-transparent to-90% h-screen">
                 <div className="flex flex-col justify-center w-120 items-center gap-y-5">
                     <div className="flex w-full">
                         <Badge color="#fff">
@@ -94,21 +94,21 @@ function Main() {
                         </div>
 
                         <div className="flex justify-between w-full">
-                            <span className="text-3xl font-bold text-emerald-600">R$3.896,00</span>
+                            <span className="text-3xl font-bold text-brand">R$3.896,00</span>
                         </div>
 
                         <div className="flex justify-between items-end w-full mt-8 gap-2">
-                            <div className="flex flex-1 h-13 rounded-2xl bg-emerald-600" />
-                            <div className="flex flex-1 h-8 rounded-2xl bg-emerald-600" />
-                            <div className="flex flex-1 h-10 rounded-2xl bg-emerald-600" />
-                            <div className="flex flex-1 h-16 rounded-2xl bg-emerald-600" />
-                            <div className="flex flex-1 h-12 rounded-2xl bg-emerald-600" />
-                            <div className="flex flex-1 h-10 rounded-2xl bg-emerald-600" />
-                            <div className="flex flex-1 h-8 rounded-2xl bg-emerald-600" />
-                            <div className="flex flex-1 h-10 rounded-2xl bg-emerald-600" />
-                            <div className="flex flex-1 h-4 rounded-2xl bg-emerald-600" />
-                            <div className="flex flex-1 h-8 rounded-2xl bg-emerald-600" />
-                            <div className="flex flex-1 h-16 rounded-2xl bg-emerald-600" />
+                            <div className="flex flex-1 h-13 rounded-2xl bg-brand" />
+                            <div className="flex flex-1 h-8 rounded-2xl bg-brand" />
+                            <div className="flex flex-1 h-10 rounded-2xl bg-brand" />
+                            <div className="flex flex-1 h-16 rounded-2xl bg-brand" />
+                            <div className="flex flex-1 h-12 rounded-2xl bg-brand" />
+                            <div className="flex flex-1 h-10 rounded-2xl bg-brand" />
+                            <div className="flex flex-1 h-8 rounded-2xl bg-brand" />
+                            <div className="flex flex-1 h-10 rounded-2xl bg-brand" />
+                            <div className="flex flex-1 h-4 rounded-2xl bg-brand" />
+                            <div className="flex flex-1 h-8 rounded-2xl bg-brand" />
+                            <div className="flex flex-1 h-16 rounded-2xl bg-brand" />
                         </div>
                     </div>
                 </div>

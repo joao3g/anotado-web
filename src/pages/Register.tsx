@@ -57,7 +57,7 @@ export default function RegisterPage() {
         <div className="flex justify-center items-center min-h-screen bg-slate-50 py-8">
             <form className="flex flex-col justify-center w-full max-w-100 px-4 items-center gap-y-5" onSubmit={handleSubmit}>
                 <div className="flex w-full items-center gap-3 mb-6">
-                    <Icon size={20} />
+                    <Icon />
                     <span className="font-[600] text-md">Anotado</span>
                 </div>
 
@@ -79,7 +79,7 @@ export default function RegisterPage() {
                 </div>
 
                 <span className="text-neutral-600 text-xs">
-                    Já tem conta? <span className="text-green-700 font-bold cursor-pointer" onClick={() => navigate("/")}>Fazer login</span>
+                    Já tem conta? <span className="text-brand font-bold cursor-pointer" onClick={() => navigate("/")}>Fazer login</span>
                 </span>
             </form>
         </div>

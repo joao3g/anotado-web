@@ -11,7 +11,7 @@ export function Input(props: CustomInputProps) {
             <label className="text-sm font-[500]">{props.label}</label>
             <input
                 {...props}
-                className="px-4 py-2 bg-white rounded-full shadow-black-100 shadow-sm/10 text-base md:text-sm focus:outline-1 focus:outline-emerald-600"
+                className="px-4 py-2 bg-white rounded-full shadow-black-100 shadow-sm/10 text-base md:text-sm focus:outline-1 focus:outline-brand"
             />
         </div>
     )
@@ -36,7 +36,7 @@ export function SearchInput(props: React.InputHTMLAttributes<HTMLInputElement>) 
     const [focus, setFocus] = useState(false);
 
     return (
-        <div className={`flex items-center gap-2 w-full px-4 py-2 bg-white rounded-full shadow-black-100 shadow-sm/10 text-base md:text-sm ${focus ? "outline-1 outline-emerald-600" : null}`} >
+        <div className={`flex items-center gap-2 w-full px-4 py-2 bg-white rounded-full shadow-black-100 shadow-sm/10 text-base md:text-sm ${focus ? "outline-1 outline-brand" : null}`} >
             <Search size={16} className="text-slate-600" />
             <input
                 {...props}
@@ -59,7 +59,7 @@ type SelectCardProps = {
 export function SelectCard(props: SelectCardProps) {
     return (
         <div 
-            className={`p-3 sm:p-4 rounded-3xl flex flex-col border-1 w-full ${props.selected ? "border-green-500 bg-green-50 shadow-md" : "border-slate-200 hover:bg-green-50/50 hover:border-green-500/50 hover:cursor-pointer"}`}
+            className={`p-3 sm:p-4 rounded-3xl flex flex-col border-1 w-full ${props.selected ? "border-brand bg-brand/5 shadow-md" : "border-slate-200 hover:bg-brand/5 hover:border-brand/50 hover:cursor-pointer"}`}
             onClick={() => props.onClick()}
         >
             <div className="mb-2 text-neutral-600">{props.icon}</div>
@@ -80,7 +80,7 @@ export function Select(props: SelectProps) {
             <label className="text-sm font-[500]">{props.label}</label>
             <select
                 {...props}
-                className="px-4 py-2 pr-10 bg-white appearance-none rounded-full shadow-black-100 shadow-sm/10 text-base md:text-sm focus:outline-1 focus:outline-emerald-600 cursor-pointer"
+                className="px-4 py-2 pr-10 bg-white appearance-none rounded-full shadow-black-100 shadow-sm/10 text-base md:text-sm focus:outline-1 focus:outline-brand cursor-pointer"
                 defaultValue="blank"
             >
                 <option id="blank" value="blank" key="blank-option" disabled hidden>Selecione uma opção</option>
@@ -110,7 +110,7 @@ export function Slider(props: SliderProps) {
             <input type="checkbox" className="sr-only peer" checked={props.checked} onChange={() => props.onChange()} />
 
             <div className="
-                relative w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 peer-checked:bg-green-600
+                relative w-11 h-6 bg-gray-200 rounded-full transition-colors duration-300 peer-checked:bg-brand
                 after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:size-5 after:trasition-transform after:duration-300 peer-checked:after:translate-x-full
             "/>
         </label>

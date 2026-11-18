@@ -71,11 +71,11 @@ export default function OnboardingPage() {
             <div className="flex flex-col w-full max-w-3xl gap-6">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <Icon size={20} />
+                        <Icon />
                         <span className="font-[600] text-md">Anotado</span>
                     </div>
 
-                    <button className="flex items-center gap-2 text-sm text-neutral-600 hover:text-black cursor-pointer" onClick={logout}>
+                    <button className="flex items-center gap-2 text-sm text-neutral-600 hover:text-ink cursor-pointer" onClick={logout}>
                         <LogOut size={16} />
                         Sair
                     </button>
@@ -89,7 +89,7 @@ export default function OnboardingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <CardSkeleton>
                         <form className="flex flex-col gap-4 h-full" onSubmit={handleJoin}>
-                            <div className="flex items-center justify-center size-10 rounded-full bg-green-100 text-green-900">
+                            <div className="flex items-center justify-center size-10 rounded-full bg-brand/10 text-brand">
                                 <KeyRound size={20} />
                             </div>
                             <div className="flex flex-col">
@@ -115,7 +115,7 @@ export default function OnboardingPage() {
 
                     <CardSkeleton>
                         <form className="flex flex-col gap-4 h-full" onSubmit={handleCreate}>
-                            <div className="flex items-center justify-center size-10 rounded-full bg-teal-100 text-teal-900">
+                            <div className="flex items-center justify-center size-10 rounded-full bg-brand/10 text-brand">
                                 <Users size={20} />
                             </div>
                             <div className="flex flex-col">

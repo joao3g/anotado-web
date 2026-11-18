@@ -55,13 +55,13 @@ export function MonthSelector(props: MonthSelectorProps) {
     if (props.compact) return selector;
 
     return (
-        <div className="flex flex-col gap-4 px-6 py-4 bg-linear-to-t from-green-50 to-white border-1 border-slate-200 rounded-3xl mx-4 mt-2">
+        <div className="flex flex-col gap-4 px-6 py-4 bg-linear-to-t from-brand/5 to-white border-1 border-slate-200 rounded-3xl mx-4 mt-2">
             <div className="flex justify-between">
                 <div className="flex gap-1 items-center">
                     <Calendar size={12} />
                     <span className="text-xs">PERÍODO</span>
                 </div>
-                <span className="text-green-500 text-xs underline cursor-pointer" onClick={() => setCurrentDate(new Date())}>Mês atual</span>
+                <span className="text-brand text-xs underline cursor-pointer" onClick={() => setCurrentDate(new Date())}>Mês atual</span>
             </div>
 
             {selector}

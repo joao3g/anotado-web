@@ -27,7 +27,7 @@ function LinkButton(props: { href: string, children: React.ReactNode }) {
             href={props.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-max rounded-full px-4 py-2 text-white bg-linear-to-r from-green-600/90 via-emerald-700/90 via-60% to-emerald-700 hover:opacity-95 font-normal text-md shadow-emerald-100 shadow-lg"
+            className="w-max rounded-full px-4 py-2 text-brand-cream bg-brand hover:opacity-95 font-normal text-md shadow-brand/15 shadow-lg"
         >
             {props.children}
         </a>
