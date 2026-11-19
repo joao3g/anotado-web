@@ -5,9 +5,13 @@ import { Input, PasswordInput } from '../components/Input';
 import * as authService from '../api/services/auth.service';
 import { useAuth } from '../hooks/useAuth';
 import { Icon } from '../components/Icon';
-import { Sparkles, TriangleAlert } from 'lucide-react';
+import { Sparkles, TrendingUp, TriangleAlert } from 'lucide-react';
 import { ResendVerificationButton } from '../components/ResendVerificationButton';
 import { useToast } from '../hooks/useToast';
+import { formatMoney } from '../utils';
+
+// "Balanço" example card: made-up bar heights (%), one bar per month.
+const EXAMPLE_HEIGHTS = [45, 62, 38, 70, 55, 88];
 
 function Main() {
     const navigate = useNavigate();
@@ -107,28 +111,22 @@ function Main() {
                         <span className="text-neutral-600 text-sm">Mapeie cada despesa, compartilhe com seu grupo e veja seu balanço crescer — tudo em um único lugar.</span>
                     </div>
 
-                    <div className="flex flex-col w-full bg-white p-6 shadow-lg rounded-3xl">
-                        <div className="flex justify-between w-full text-neutral-600 text-sm">
-                            <span>Balanço</span>
-                            <span>+24.6%</span>
+                    {/* Example card (no real data on the login page): hidden from screen readers. */}
+                    <div aria-hidden="true" className="flex flex-col w-full bg-white border-1 border-slate-200 p-6 shadow-lg rounded-3xl">
+                        <div className="flex justify-between items-center w-full">
+                            <span className="text-neutral-600 text-sm">Balanço</span>
+                            <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-[600] bg-green-100 text-green-700">
+                                <TrendingUp size={14} />
+                                +24,6%
+                            </span>
                         </div>
 
-                        <div className="flex justify-between w-full">
-                            <span className="text-3xl font-bold text-brand">R$3.896,00</span>
-                        </div>
+                        <span className="text-3xl font-bold text-brand">{formatMoney("389600")}</span>
 
-                        <div className="flex justify-between items-end w-full mt-8 gap-2">
-                            <div className="flex flex-1 h-13 rounded-2xl bg-brand" />
-                            <div className="flex flex-1 h-8 rounded-2xl bg-brand" />
-                            <div className="flex flex-1 h-10 rounded-2xl bg-brand" />
-                            <div className="flex flex-1 h-16 rounded-2xl bg-brand" />
-                            <div className="flex flex-1 h-12 rounded-2xl bg-brand" />
-                            <div className="flex flex-1 h-10 rounded-2xl bg-brand" />
-                            <div className="flex flex-1 h-8 rounded-2xl bg-brand" />
-                            <div className="flex flex-1 h-10 rounded-2xl bg-brand" />
-                            <div className="flex flex-1 h-4 rounded-2xl bg-brand" />
-                            <div className="flex flex-1 h-8 rounded-2xl bg-brand" />
-                            <div className="flex flex-1 h-16 rounded-2xl bg-brand" />
+                        <div className="flex justify-between items-end w-full h-28 mt-8 gap-3">
+                            {EXAMPLE_HEIGHTS.map((height, index) => (
+                                <div key={index} className="flex-1 rounded-2xl bg-brand" style={{ height: `${height}%` }} />
+                            ))}
                         </div>
                     </div>
                 </div>
