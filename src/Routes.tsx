@@ -10,6 +10,7 @@ import ComponentsPage from "./pages/Components";
 import RegisterPage from "./pages/Register";
 import ForgotPasswordPage from "./pages/ForgotPassword";
 import ResetPasswordPage from "./pages/ResetPassword";
+import VerifyEmailPage from "./pages/VerifyEmail";
 import OnboardingPage from "./pages/Onboarding";
 import SettingsPage from "./pages/settings/Settings";
 import ProfileTab from "./pages/settings/ProfileTab";
@@ -50,6 +51,11 @@ export const router = createBrowserRouter([
         // Opened from the reset email. No redirect when logged in: the link may be opened on a logged-in phone.
         path: "/reset-password",
         element: <ResetPasswordPage />,
+    },
+    {
+        // Opened from the sign-up email. No redirect when logged in, same reason as above.
+        path: "/verify-email",
+        element: <VerifyEmailPage />,
     },
     {
         // Logged in, but without a family yet
