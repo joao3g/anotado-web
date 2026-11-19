@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { ChevronsUpDown, LogOut, Settings, Users } from "lucide-react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { ChevronsUpDown, LogOut, Moon, Settings, Users } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { useAuth } from "../hooks/useAuth";
+import { isDarkMode, setDarkMode, subscribeToDarkMode } from "../theme";
 
 type AccountMenuProps = {
     onNavigate: (path: string) => void // Also closes the mobile drawer (Sidebar.goTo)
@@ -14,6 +15,8 @@ export function AccountMenu(props: AccountMenuProps) {
     const { user } = useAuth();
     const [open, setOpen] = useState(false);
     const rootRef = useRef<HTMLDivElement>(null);
+    // Follows the toggle and, while no choice is saved, the phone/PC setting.
+    const dark = useSyncExternalStore(subscribeToDarkMode, isDarkMode);
 
     useEffect(() => {
         if (!open) return;
@@ -75,6 +78,20 @@ export function AccountMenu(props: AccountMenuProps) {
                         >
                             <Settings size={16} />
                             Configurações
+                        </button>
+
+                        {/* Stays open after the switch, so the user sees the change. Saved on this device only. */}
+                        <button
+                            role="menuitemcheckbox"
+                            aria-checked={dark}
+                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-[500] text-neutral-700 hover:bg-neutral-100 hover:text-ink cursor-pointer"
+                            onClick={() => setDarkMode(!dark)}
+                        >
+                            <Moon size={16} />
+                            <span className="flex-1 text-left">Modo escuro</span>
+                            <span className={`flex items-center w-9 h-5 p-0.5 rounded-full transition-colors ${dark ? "bg-brand" : "bg-slate-200"}`}>
+                                <span className={`size-4 rounded-full bg-snow shadow-sm transition-transform ${dark ? "translate-x-4" : ""}`} />
+                            </span>
                         </button>
                     </div>
 

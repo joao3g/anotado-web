@@ -9,6 +9,7 @@
   --color-brand-cream: #FFF6E5; /* Text and surfaces on teal */
   --color-brand-coral: #FF7A59; /* Small highlights only. Never for money values. */
   --color-ink: #12201F;         /* Text on light backgrounds */
+  --color-snow: #ffffff;        /* Always white, also in dark mode (camera screen, text on red buttons) */
 
   /* Toasts: slide in from the top, and a bar that empties during the toast's duration */
   --animate-toast-in: toast-in 220ms ease-out;
@@ -23,6 +24,83 @@
     from { transform: scaleX(1); }
     to { transform: scaleX(0); }
   }
+}
+
+/* Dark mode: the "dark" class on <html> (src/theme.ts; index.html sets it before the app starts).
+   Instead of dark: classes everywhere, the palette colors the app uses get dark values here, so
+   bg-white is the card surface, text-neutral-600 the secondary text, and so on in both modes.
+   For "always white", use text-snow / bg-snow. dark: is available for small fixes. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root.dark {
+  color-scheme: dark; /* Native inputs, scrollbars and date pickers */
+
+  --color-brand: #4DB6AA;       /* Lighter teal: the logo teal is too dark to read on dark surfaces */
+  --color-brand-cream: #0B1F1D; /* Text on teal becomes dark */
+  --color-ink: #E6ECEB;
+
+  /* Surfaces and borders */
+  --color-white: #131D1C;       /* Cards, menus, modals, inputs */
+  --color-slate-50: #0B1312;    /* Page background */
+  --color-slate-200: #263331;   /* Borders */
+  --color-neutral-100: #1D2928; /* Hover and subtle backgrounds */
+  --color-gray-100: #1D2928;
+  --color-gray-200: #2A3735;
+
+  /* Text grays (light on dark) */
+  --color-neutral-400: #6B7A78;
+  --color-gray-400: #6B7A78;
+  --color-neutral-500: #8A9896;
+  --color-neutral-600: #A3B0AE;
+  --color-slate-600: #A3B0AE;
+  --color-neutral-700: #C3CDCB;
+  --color-gray-700: #C3CDCB;
+  --color-neutral-800: #DCE3E2;
+  --color-neutral-900: #EEF2F1;
+  --color-slate-900: #E6ECEB;
+
+  /* Status tints: dark backgrounds, light text */
+  --color-red-50: #2A1414;
+  --color-red-100: #3A1A1A;
+  --color-red-200: #5A2626;
+  --color-red-500: #E5484D;
+  --color-red-600: #F87171;
+  --color-red-700: #FCA5A5;
+  --color-red-900: #FECACA;
+  --color-green-100: #12301F;
+  --color-green-600: #4ADE80;
+  --color-green-700: #6EE7A0;
+  --color-green-900: #BBF7D0;
+  --color-orange-50: #2B1B0E;
+  --color-orange-200: #5C3A1A;
+  --color-orange-600: #FB923C;
+  --color-orange-700: #FDBA74;
+  --color-yellow-100: #33290F;
+  --color-yellow-700: #FCD34D;
+  --color-blue-100: #13243D;
+  --color-blue-700: #93C5FD;
+}
+
+:root.dark body {
+  background-color: var(--color-slate-50);
+}
+
+/* Charts (Recharts draws light-mode colors as attributes and inline styles) */
+:root.dark .recharts-cartesian-grid line {
+  stroke: var(--color-slate-200);
+}
+:root.dark .recharts-cartesian-axis-tick-value {
+  fill: var(--color-neutral-600);
+}
+:root.dark .recharts-tooltip-cursor {
+  fill: var(--color-neutral-100);
+}
+:root.dark .recharts-default-tooltip {
+  background-color: var(--color-white) !important;
+  border-color: var(--color-slate-200) !important;
+}
+:root.dark .recharts-pie-sector path {
+  stroke: var(--color-white);
 }
 
 @media (prefers-reduced-motion: reduce) {

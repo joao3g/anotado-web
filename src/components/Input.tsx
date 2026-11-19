@@ -27,7 +27,7 @@ export function MoreOptionButton(props: MoreOptionButtonProps) {
             className="flex justify-center items-center size-8 rounded-full hover:bg-slate-200/40 hover:cursor-pointer"
             onClick={props.onClick}
         >
-            <Ellipsis size={16} color="black" fill="black" />
+            <Ellipsis size={16} className="text-ink" fill="currentColor" />
         </div>
     );
 }
