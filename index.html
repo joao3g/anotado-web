@@ -19,6 +19,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   <title>Anotado</title>
+
+  <!-- Dark mode before the app loads (no white flash). Same rule as src/theme.ts: saved choice, else the system setting. -->
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem("theme"); } catch (e) { }
+      var dark = saved === "dark" || (saved !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      if (dark) {
+        document.documentElement.classList.add("dark");
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", "#131D1C");
+      }
+    })();
+  </script>
 </head>
 
 <body class="font-inter">

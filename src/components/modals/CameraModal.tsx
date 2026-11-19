@@ -95,17 +95,17 @@ export function CameraModal(props: CameraModalProps) {
     }
 
     return (
-        <div className="fixed inset-0 z-900 flex flex-col bg-black text-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+        <div className="fixed inset-0 z-900 flex flex-col bg-black text-snow pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
             <div className="flex justify-between items-center h-14 px-4">
                 <span className="text-lg font-[600]">Tirar foto</span>
-                <button aria-label="Fechar" className="flex justify-center items-center size-10 rounded-full hover:bg-white/10 cursor-pointer" onClick={props.onClose}>
+                <button aria-label="Fechar" className="flex justify-center items-center size-10 rounded-full hover:bg-snow/10 cursor-pointer" onClick={props.onClose}>
                     <X size={22} />
                 </button>
             </div>
 
             <div className="flex flex-1 justify-center items-center px-4">
                 {/* Square view = exactly the part that is saved (center crop) */}
-                <div className="relative w-full max-w-md aspect-square overflow-hidden rounded-3xl bg-neutral-900">
+                <div className="relative w-full max-w-md aspect-square overflow-hidden rounded-3xl bg-snow/10">
                     <video
                         ref={videoRef}
                         playsInline
@@ -118,15 +118,15 @@ export function CameraModal(props: CameraModalProps) {
                         : null}
 
                     {!captured && live ?
-                        <div className="pointer-events-none absolute inset-6 rounded-full border-2 border-white/60" />
+                        <div className="pointer-events-none absolute inset-6 rounded-full border-2 border-snow/60" />
                         : null}
 
                     {!live && !error && !captured ?
-                        <span className="absolute inset-0 flex justify-center items-center text-sm text-white/70">Abrindo a câmera...</span>
+                        <span className="absolute inset-0 flex justify-center items-center text-sm text-snow/70">Abrindo a câmera...</span>
                         : null}
 
                     {error ?
-                        <span className="absolute inset-0 flex justify-center items-center p-6 text-center text-sm text-white/90">{error}</span>
+                        <span className="absolute inset-0 flex justify-center items-center p-6 text-center text-sm text-snow/90">{error}</span>
                         : null}
                 </div>
             </div>
@@ -146,7 +146,7 @@ export function CameraModal(props: CameraModalProps) {
                         <div className="size-12" />
                         <button
                             aria-label="Capturar foto"
-                            className="flex justify-center items-center size-18 rounded-full bg-white text-ink border-4 border-white/40 bg-clip-padding cursor-pointer disabled:opacity-40"
+                            className="flex justify-center items-center size-18 rounded-full bg-snow text-black border-4 border-snow/40 bg-clip-padding cursor-pointer disabled:opacity-40"
                             disabled={!live}
                             onClick={capture}
                         >
@@ -155,7 +155,7 @@ export function CameraModal(props: CameraModalProps) {
                         {canSwitch ?
                             <button
                                 aria-label="Trocar câmera"
-                                className="flex justify-center items-center size-12 rounded-full bg-white/10 hover:bg-white/20 cursor-pointer"
+                                className="flex justify-center items-center size-12 rounded-full bg-snow/10 hover:bg-snow/20 cursor-pointer"
                                 onClick={switchCamera}
                             >
                                 <SwitchCamera size={22} />

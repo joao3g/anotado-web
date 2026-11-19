@@ -7,6 +7,10 @@ import { ToastProvider } from './context/ToastContext.tsx';
 import { DateProvider } from './context/DateContext.tsx';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './Routes.tsx';
+import { initTheme } from './theme.ts';
+
+// Dark mode: saved choice or the system setting (index.html already applied it, this also follows system changes).
+initTheme();
 
 // PWA service worker (public/sw.js). Production builds only, so it never gets in the way of Vite dev/HMR.
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
