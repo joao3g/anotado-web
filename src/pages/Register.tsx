@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Button } from '../components/Button';
-import { Input } from '../components/Input';
+import { Input, PasswordInput } from '../components/Input';
 import { Icon } from '../components/Icon';
 import { ResendVerificationButton } from '../components/ResendVerificationButton';
 import { MailCheck } from 'lucide-react';
@@ -101,8 +101,8 @@ export default function RegisterPage() {
                 <Input type="text" label="Nome completo" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
                 <Input type="email" label="E-mail" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 <Input type="text" label="Login" autoComplete="username" autoCapitalize="none" value={login} onChange={(e) => setLogin(e.target.value)} />
-                <Input type="password" label="Senha" autoComplete="new-password" placeholder="Mínimo de 8 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} />
-                <Input type="password" label="Confirmar senha" autoComplete="new-password" value={passwordRepeat} onChange={(e) => setPasswordRepeat(e.target.value)} />
+                <PasswordInput label="Senha" autoComplete="new-password" placeholder="Mínimo de 8 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <PasswordInput label="Confirmar senha" autoComplete="new-password" value={passwordRepeat} onChange={(e) => setPasswordRepeat(e.target.value)} />
 
                 <div className="flex w-full">
                     <Button variant="primary" type="submit" disabled={submitting}>

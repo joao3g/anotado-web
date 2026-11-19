@@ -39,6 +39,8 @@ export const inputToCents = (value: string) => Number(value.replace(/\D/g, "").s
 
 export const hexToHsl = (hex: string) => {
     hex = hex.replace("#", "")
+    // Short form "fff" = "ffffff". Without this, the color math gives NaN and the CSS color is ignored.
+    if (hex.length === 3) hex = hex.split("").map(char => char + char).join("")
 
     const r = parseInt(hex.substring(0, 2), 16) / 255
     const g = parseInt(hex.substring(2, 4), 16) / 255
