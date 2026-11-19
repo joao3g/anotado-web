@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Button } from '../components/Button';
-import { Input } from '../components/Input';
+import { Input, PasswordInput } from '../components/Input';
 import * as authService from '../api/services/auth.service';
 import { useAuth } from '../hooks/useAuth';
 import { Icon } from '../components/Icon';
@@ -58,9 +58,9 @@ function Main() {
                     />
 
                     <div className="flex flex-col w-full gap-y-1">
-                        <Input
-                            type="password"
+                        <PasswordInput
                             label="Senha"
+                            autoComplete="current-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" ? handleLogin() : null}

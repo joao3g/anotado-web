@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '../../components/Button';
-import { Input } from '../../components/Input';
+import { PasswordInput } from '../../components/Input';
 import { CardSkeleton } from '../../components/CardSkeleton';
 import * as authService from '../../api/services/auth.service';
 import { getApiErrorMessage } from '../../api/services/client';
@@ -51,9 +51,9 @@ export default function SecurityTab() {
                     <span className="text-xs text-neutral-600">Mínimo de 8 caracteres. Outros aparelhos já conectados continuam conectados.</span>
                 </div>
 
-                <Input type="password" label="Senha atual" autoComplete="current-password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
-                <Input type="password" label="Nova senha" autoComplete="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-                <Input type="password" label="Repetir nova senha" autoComplete="new-password" value={newPasswordRepeat} onChange={(e) => setNewPasswordRepeat(e.target.value)} />
+                <PasswordInput label="Senha atual" autoComplete="current-password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+                <PasswordInput label="Nova senha" autoComplete="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                <PasswordInput label="Repetir nova senha" autoComplete="new-password" value={newPasswordRepeat} onChange={(e) => setNewPasswordRepeat(e.target.value)} />
 
                 <div className="w-full sm:w-max">
                     <Button variant="primary" type="submit" disabled={saving || !currentPassword || !newPassword || !newPasswordRepeat}>

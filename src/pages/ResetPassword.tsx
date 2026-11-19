@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { TriangleAlert } from 'lucide-react';
 import { Button } from '../components/Button';
-import { Input } from '../components/Input';
+import { PasswordInput } from '../components/Input';
 import { Icon } from '../components/Icon';
 import * as authService from '../api/services/auth.service';
 import { getApiErrorMessage } from '../api/services/client';
@@ -82,8 +82,8 @@ export default function ResetPasswordPage() {
                             <span className="text-sm text-neutral-600">Mínimo de 8 caracteres.</span>
                         </div>
 
-                        <Input type="password" label="Nova senha" autoComplete="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-                        <Input type="password" label="Repetir nova senha" autoComplete="new-password" value={newPasswordRepeat} onChange={(e) => setNewPasswordRepeat(e.target.value)} />
+                        <PasswordInput label="Nova senha" autoComplete="new-password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                        <PasswordInput label="Repetir nova senha" autoComplete="new-password" value={newPasswordRepeat} onChange={(e) => setNewPasswordRepeat(e.target.value)} />
 
                         <Button variant="primary" type="submit" disabled={saving || !newPassword || !newPasswordRepeat}>
                             {saving ? "Salvando..." : "Salvar nova senha"}

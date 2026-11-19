@@ -1,5 +1,5 @@
-import { ChevronDown, Ellipsis, Search } from "lucide-react";
-import { useState } from "react";
+import { ChevronDown, Ellipsis, Eye, EyeOff, Search } from "lucide-react";
+import { useId, useState } from "react";
 
 interface CustomInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
@@ -13,6 +13,37 @@ export function Input(props: CustomInputProps) {
                 {...props}
                 className="px-4 py-2 bg-white rounded-full shadow-black-100 shadow-sm/10 text-base md:text-sm focus:outline-1 focus:outline-brand"
             />
+        </div>
+    )
+}
+
+// Password field with an eye button: hidden by default, shown only while the user turns it on.
+// type="button" so the eye never submits the form. autoComplete is kept for password managers.
+export function PasswordInput({ label, ...props }: Omit<CustomInputProps, "type">) {
+    const [visible, setVisible] = useState(false);
+    const id = useId();
+
+    return (
+        <div className="flex flex-col gap-y-1 flex-1 w-full">
+            <label htmlFor={props.id ?? id} className="text-sm font-[500]">{label}</label>
+            <div className="relative w-full">
+                <input
+                    id={id}
+                    {...props}
+                    type={visible ? "text" : "password"}
+                    className="w-full pl-4 pr-11 py-2 bg-white rounded-full shadow-black-100 shadow-sm/10 text-base md:text-sm focus:outline-1 focus:outline-brand"
+                />
+                <button
+                    type="button"
+                    aria-label={visible ? "Ocultar senha" : "Mostrar senha"}
+                    aria-pressed={visible}
+                    title={visible ? "Ocultar senha" : "Mostrar senha"}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 flex justify-center items-center size-8 rounded-full text-neutral-500 hover:text-ink hover:bg-neutral-100 cursor-pointer focus-visible:outline-1 focus-visible:outline-brand"
+                    onClick={() => setVisible(current => !current)}
+                >
+                    {visible ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+            </div>
         </div>
     )
 }
