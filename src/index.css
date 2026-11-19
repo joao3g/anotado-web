@@ -33,3 +33,8 @@
 body {
   color: var(--color-ink);
 }
+
+/* Charts: hide the browser focus ring after a tap or click (keyboard focus still shows it) */
+.recharts-wrapper :focus:not(:focus-visible) {
+  outline: none;
+}
