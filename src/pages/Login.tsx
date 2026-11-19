@@ -6,7 +6,8 @@ import * as authService from '../api/services/auth.service';
 import { useAuth } from '../hooks/useAuth';
 import { Icon } from '../components/Icon';
 import { Badge } from '../components/Badge';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, TriangleAlert } from 'lucide-react';
+import { ResendVerificationButton } from '../components/ResendVerificationButton';
 import { useToast } from '../hooks/useToast';
 
 function Main() {
@@ -14,17 +15,23 @@ function Main() {
 
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
+    const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null); // Set when login answered "confirm your email"
 
     const authContext = useAuth();
     const { addToast } = useToast();
 
     async function handleLogin() {
+        setUnverifiedEmail(null);
         try {
             const result = await authService.login(login, password);
 
             authContext.login(result.token, result.user);
             return navigate(result.user.group ? "/dashboard" : "/onboarding");
         } catch (error) {
+            // Right password, but the sign-up email was not confirmed yet.
+            const notVerified = authService.getEmailNotVerified(error);
+            if (notVerified) return setUnverifiedEmail(notVerified.email);
+
             addToast("Login e/ou senha incorretos!", "error");
         }
     }
@@ -51,13 +58,28 @@ function Main() {
                         onKeyDown={(e) => e.key === "Enter" ? handleLogin() : null}
                     />
 
-                    <Input
-                        type="password"
-                        label="Senha"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" ? handleLogin() : null}
-                    />
+                    <div className="flex flex-col w-full gap-y-1">
+                        <Input
+                            type="password"
+                            label="Senha"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" ? handleLogin() : null}
+                        />
+                        <span className="self-end text-brand font-bold text-xs cursor-pointer" onClick={() => navigate("/forgot-password")}>Esqueceu a senha?</span>
+                    </div>
+
+                    {unverifiedEmail !== null ?
+                        <div className="flex flex-col w-full gap-3 p-4 bg-orange-50 border-1 border-orange-200 rounded-3xl text-orange-700">
+                            <div className="flex gap-2 items-center">
+                                <TriangleAlert size={18} className="shrink-0" />
+                                <span className="text-sm">
+                                    Confirme seu e-mail para entrar. Enviamos um link para <strong>{unverifiedEmail}</strong> quando você criou a conta.
+                                </span>
+                            </div>
+                            <ResendVerificationButton email={unverifiedEmail} />
+                        </div>
+                        : null}
 
                     <div className="flex flex-row gap-x-3 flex-1 w-full">
                         <Button
