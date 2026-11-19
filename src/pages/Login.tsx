@@ -5,7 +5,6 @@ import { Input } from '../components/Input';
 import * as authService from '../api/services/auth.service';
 import { useAuth } from '../hooks/useAuth';
 import { Icon } from '../components/Icon';
-import { Badge } from '../components/Badge';
 import { Sparkles, TriangleAlert } from 'lucide-react';
 import { ResendVerificationButton } from '../components/ResendVerificationButton';
 import { useToast } from '../hooks/useToast';
@@ -96,12 +95,11 @@ function Main() {
             <div className="hidden lg:flex flex-1 justify-center bg-radial-[at_0%_90%] from-transparent from-10% via-brand/12 to-transparent to-90% h-screen">
                 <div className="flex flex-col justify-center w-120 items-center gap-y-5">
                     <div className="flex w-full">
-                        <Badge color="#fff">
-                            <div className="flex gap-2">
-                                <Sparkles size={16} color="green" />
-                                Compartilhe com a família
-                            </div>
-                        </Badge>
+                        {/* Card colors (bg-white, text-ink), so it follows dark mode like the other cards */}
+                        <span className="inline-flex items-center gap-2 rounded-full px-2 py-1 text-xs font-medium h-max bg-white text-ink border-1 border-slate-200">
+                            <Sparkles size={16} className="text-green-600" />
+                            Compartilhe com a família
+                        </span>
                     </div>
 
                     <div className="flex flex-col w-full">
