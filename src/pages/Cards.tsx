@@ -210,7 +210,7 @@ export default function Main() {
                                                         {card.title}
                                                     </span>
                                                     <span className="text-[11px]/3 text-neutral-600">
-                                                        {card.lastFourDigits ? `•••• ${card.lastFourDigits} · ` : null}Fecha dia {card.closingDay}
+                                                        {card.lastFourDigits ? `•••• ${card.lastFourDigits} · ` : null}Fecha dia {card.closingDay} · vence dia {card.dueDay}
                                                     </span>
                                                     {isLoadingExpenses ?
                                                         <LoadingSkeleton className="h-3 w-16 rounded-lg mt-1" />

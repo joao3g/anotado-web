@@ -17,22 +17,28 @@ type AddOrEditCardModalProps = {
 export function AddOrEditCardModal(props: AddOrEditCardModalProps) {
 
     const [title, setTitle] = useState(props.data?.title || "");
-    // Strings: "0123" keeps its leading zero, and the closing day input can be empty while typing.
+    // Strings: "0123" keeps its leading zero, and the day inputs can be empty while typing.
     const [lastFourDigits, setLastFourDigits] = useState(props.data?.lastFourDigits || "");
     const [closingDay, setClosingDay] = useState(props.data ? String(props.data.closingDay) : "");
+    const [dueDay, setDueDay] = useState(props.data ? String(props.data.dueDay) : "");
     const [color, setColor] = useState(props.data?.color || "");
 
     const { addToast } = useToast();
 
     const closingDayNumber = Number(closingDay);
-    const closingDayChanged = props.data !== undefined && closingDay !== "" && closingDayNumber !== props.data.closingDay;
+    const dueDayNumber = Number(dueDay);
+    const daysChanged = props.data !== undefined && (
+        (closingDay !== "" && closingDayNumber !== props.data.closingDay) ||
+        (dueDay !== "" && dueDayNumber !== props.data.dueDay)
+    );
 
     function validate() {
         if (!title.trim()) return "Informe o nome do cartão.";
         if (lastFourDigits && !/^\d{4}$/.test(lastFourDigits)) return "Os últimos dígitos devem ter 4 números.";
         if (!color) return "Selecione uma cor.";
-        // 1..27: the invoice day (closing day + 1) must exist in every month.
-        if (!Number.isInteger(closingDayNumber) || closingDayNumber < 1 || closingDayNumber > 27) return "O dia de fechamento deve ser entre 1 e 27.";
+        if (closingDay === "" || !Number.isInteger(closingDayNumber) || closingDayNumber < 1 || closingDayNumber > 27) return "O dia de fechamento deve ser entre 1 e 27.";
+        // 1..28: the due day must exist in every month.
+        if (dueDay === "" || !Number.isInteger(dueDayNumber) || dueDayNumber < 1 || dueDayNumber > 28) return "O dia de vencimento deve ser entre 1 e 28.";
         return null;
     }
 
@@ -43,7 +49,7 @@ export function AddOrEditCardModal(props: AddOrEditCardModalProps) {
         try {
             if (props.data) {
                 // "" clears the digits on the backend.
-                const result = await updateCard({ id: props.data.id, title: title.trim(), lastFourDigits, color, closingDay: closingDayNumber });
+                const result = await updateCard({ id: props.data.id, title: title.trim(), lastFourDigits, color, closingDay: closingDayNumber, dueDay: dueDayNumber });
                 addToast(
                     result.recalculatedExpenses > 0
                         ? `Cartão editado! ${result.recalculatedExpenses} despesa(s) com vencimento futuro recalculada(s).`
@@ -53,7 +59,7 @@ export function AddOrEditCardModal(props: AddOrEditCardModalProps) {
                 props.onSuccess(e, result.recalculatedExpenses);
             }
             else {
-                await createCard({ title: title.trim(), lastFourDigits: lastFourDigits || undefined, color, closingDay: closingDayNumber });
+                await createCard({ title: title.trim(), lastFourDigits: lastFourDigits || undefined, color, closingDay: closingDayNumber, dueDay: dueDayNumber });
                 addToast("Cartão criado com sucesso!", "info");
                 props.onSuccess(e, 0);
             }
@@ -72,7 +78,7 @@ export function AddOrEditCardModal(props: AddOrEditCardModalProps) {
                             {props.data ? "Editar cartão" : "Novo cartão"}
                         </span>
                         <span className="text-xs text-neutral-600">
-                            Compras no crédito entram na fatura pelo dia de fechamento do cartão.
+                            Compras no crédito entram na fatura pelo dia de fechamento e aparecem no mês do vencimento.
                         </span>
                     </div>
                     <X
@@ -89,17 +95,17 @@ export function AddOrEditCardModal(props: AddOrEditCardModalProps) {
                     placeholder="Ex.: Nubank"
                 />
 
-                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                    <Input
-                        type="text"
-                        label="Últimos 4 dígitos (Opcional)"
-                        inputMode="numeric"
-                        maxLength={4}
-                        value={lastFourDigits}
-                        onChange={(e) => { setLastFourDigits(e.target.value.replace(/\D/g, "").slice(0, 4)); }}
-                        placeholder="Ex.: 1234"
-                    />
+                <Input
+                    type="text"
+                    label="Últimos 4 dígitos (Opcional)"
+                    inputMode="numeric"
+                    maxLength={4}
+                    value={lastFourDigits}
+                    onChange={(e) => { setLastFourDigits(e.target.value.replace(/\D/g, "").slice(0, 4)); }}
+                    placeholder="Ex.: 1234"
+                />
 
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                     <Input
                         type="text"
                         label="Dia de fechamento"
@@ -109,13 +115,23 @@ export function AddOrEditCardModal(props: AddOrEditCardModalProps) {
                         onChange={(e) => { setClosingDay(e.target.value.replace(/\D/g, "").slice(0, 2)); }}
                         placeholder="1 a 27"
                     />
+
+                    <Input
+                        type="text"
+                        label="Dia de vencimento"
+                        inputMode="numeric"
+                        maxLength={2}
+                        value={dueDay}
+                        onChange={(e) => { setDueDay(e.target.value.replace(/\D/g, "").slice(0, 2)); }}
+                        placeholder="1 a 28"
+                    />
                 </div>
 
-                {closingDayChanged ?
+                {daysChanged ?
                     <div className="flex gap-2 items-center p-4 bg-orange-50 border-1 border-orange-200 rounded-3xl text-orange-700">
                         <TriangleAlert size={18} className="shrink-0" />
                         <span className="text-xs">
-                            Despesas com vencimento futuro neste cartão serão recalculadas com o novo dia de fechamento. Despesas já vencidas não mudam.
+                            Despesas com vencimento futuro neste cartão serão recalculadas com os novos dias. Despesas já vencidas não mudam.
                         </span>
                     </div>
                     : null}
@@ -135,7 +151,7 @@ export function AddOrEditCardModal(props: AddOrEditCardModalProps) {
                                     {title ? cardLabel({ title, lastFourDigits: lastFourDigits.length === 4 ? lastFourDigits : null }) : "Nome do cartão"}
                                 </span>
                                 <span className="text-[11px]/2 text-neutral-600">
-                                    {closingDay ? `Fecha dia ${closingDay} · vence dia ${closingDayNumber + 1}` : "Dia de fechamento"}
+                                    {closingDay || dueDay ? `Fecha dia ${closingDay || "?"} · vence dia ${dueDay || "?"}` : "Dias de fechamento e vencimento"}
                                 </span>
                             </div>
                         </div>

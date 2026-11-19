@@ -36,7 +36,7 @@ export function PaymentMethodBadge(props: PaymentMethodBadgeProps) {
                         <span className="size-2.5 rounded-full shrink-0" style={{ backgroundColor: `#${props.card.color}` }} />
                         <span className="text-xs font-[600] text-ink">{cardLabel(props.card)}</span>
                     </div>
-                    <span className="text-[11px] text-neutral-600">Fecha dia {props.card.closingDay}</span>
+                    <span className="text-[11px] text-neutral-600">Fecha dia {props.card.closingDay} · vence dia {props.card.dueDay}</span>
                 </div>
                 : null}
         </div>

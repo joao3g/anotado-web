@@ -31,6 +31,7 @@ export type ExpenseCard = {
     lastFourDigits: string | null
     color: string // Hex WITHOUT "#"
     closingDay: number
+    dueDay: number
 }
 
 export type Expense = {
