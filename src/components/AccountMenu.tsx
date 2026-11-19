@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ChevronsUpDown, LogOut, Moon, Settings, Users } from "lucide-react";
+import { createPortal } from "react-dom";
+import { ChevronsUpDown, LogOut, MessageSquareWarning, Moon, Settings, Users } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { useAuth } from "../hooks/useAuth";
 import { isDarkMode, setDarkMode, subscribeToDarkMode } from "../theme";
+import { ReportProblemModal } from "./modals/ReportProblemModal";
 
 type AccountMenuProps = {
     onNavigate: (path: string) => void // Also closes the mobile drawer (Sidebar.goTo)
@@ -14,6 +16,7 @@ type AccountMenuProps = {
 export function AccountMenu(props: AccountMenuProps) {
     const { user } = useAuth();
     const [open, setOpen] = useState(false);
+    const [reportOpen, setReportOpen] = useState(false);
     const rootRef = useRef<HTMLDivElement>(null);
     // Follows the toggle and, while no choice is saved, the phone/PC setting.
     const dark = useSyncExternalStore(subscribeToDarkMode, isDarkMode);
@@ -93,6 +96,15 @@ export function AccountMenu(props: AccountMenuProps) {
                                 <span className={`size-4 rounded-full bg-snow shadow-sm transition-transform ${dark ? "translate-x-4" : ""}`} />
                             </span>
                         </button>
+
+                        <button
+                            role="menuitem"
+                            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-[500] text-neutral-700 hover:bg-neutral-100 hover:text-ink cursor-pointer"
+                            onClick={() => { setOpen(false); setReportOpen(true); }}
+                        >
+                            <MessageSquareWarning size={16} />
+                            Reportar problema
+                        </button>
                     </div>
 
                     <div className="p-1.5 border-t-1 border-slate-200">
@@ -122,6 +134,9 @@ export function AccountMenu(props: AccountMenuProps) {
                 </div>
                 <ChevronsUpDown size={16} className="shrink-0 text-neutral-500" />
             </button>
+
+            {/* Portal: the mobile drawer uses translate-x, which would trap a fixed modal inside the 280px menu. */}
+            {reportOpen ? createPortal(<ReportProblemModal onClose={() => setReportOpen(false)} />, document.body) : null}
         </div>
     );
 }
