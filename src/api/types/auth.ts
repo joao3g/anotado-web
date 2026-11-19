@@ -6,6 +6,7 @@ export type User = {
     email: string,
     phone: string | null // Digits only, e.g. "11912345678"
     avatar: string | null // "data:image/jpeg;base64,..." (256x256)
+    pendingEmail: string | null // New email asked in Perfil, waiting for its link; `email` is still the account's email
     // null until the user joins or creates a family (then the app shows /onboarding)
     group: {
         title: string
