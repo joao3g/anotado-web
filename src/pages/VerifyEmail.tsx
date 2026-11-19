@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { CircleCheck, TriangleAlert } from 'lucide-react';
@@ -6,6 +7,8 @@ import { Input } from '../components/Input';
 import { Icon } from '../components/Icon';
 import { ResendVerificationButton } from '../components/ResendVerificationButton';
 import * as authService from '../api/services/auth.service';
+import { getApiErrorMessage } from '../api/services/client';
+import { useAuth } from '../hooks/useAuth';
 
 // The token comes in the URL hash (#token=...): browsers never send the hash to a server.
 // No side effect here: React may call a state initializer twice.
@@ -20,7 +23,10 @@ export default function VerifyEmailPage() {
     const navigate = useNavigate();
 
     const [token] = useState(readTokenFromHash);
-    const [status, setStatus] = useState<"checking" | "ok" | "invalid">(token ? "checking" : "invalid");
+    const authContext = useAuth();
+    // "changed": a new email from Settings > Perfil. "taken": another account got that email first.
+    const [status, setStatus] = useState<"checking" | "ok" | "changed" | "taken" | "invalid">(token ? "checking" : "invalid");
+    const [takenMessage, setTakenMessage] = useState("");
     const [email, setEmail] = useState("");
     // The link works once. React StrictMode runs effects twice in development: without this guard
     // the second call would find the token already used and show "invalid".
@@ -34,9 +40,21 @@ export default function VerifyEmailPage() {
         called.current = true;
 
         authService.verifyEmail(token)
-            .then(() => setStatus("ok"))
-            .catch(() => setStatus("invalid"));
-    }, [token]);
+            .then(async ({ emailChanged }) => {
+                setStatus(emailChanged ? "changed" : "ok");
+                // Logged in on this device: show the new email at once.
+                if (emailChanged && localStorage.getItem("token")) await authContext.refreshUser().catch(() => { });
+            })
+            .catch((error) => {
+                if (isAxiosError(error) && error.response?.status === 409) {
+                    setTakenMessage(getApiErrorMessage(error, "Este e-mail já está em uso em outra conta."));
+                    setStatus("taken");
+                }
+                else setStatus("invalid");
+            });
+    }, [token, authContext]);
+
+    const loggedIn = Boolean(authContext.user);
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-slate-50">
@@ -48,6 +66,29 @@ export default function VerifyEmailPage() {
 
                 {status === "checking" ?
                     <span className="w-full text-sm text-neutral-600">Confirmando seu e-mail...</span>
+                    : status === "changed" ?
+                        <div className="flex flex-col w-full gap-4">
+                            <div className="flex items-center justify-center size-12 rounded-full bg-brand/10 text-brand">
+                                <CircleCheck size={22} />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="font-[600] text-xl">E-mail alterado!</span>
+                                <span className="text-sm text-neutral-600">Sua conta agora usa este e-mail para login, recuperação de senha e avisos.</span>
+                            </div>
+                            <Button variant="primary" type="button" onClick={() => navigate(loggedIn ? "/settings/profile" : "/")}>
+                                {loggedIn ? "Ir para o Perfil" : "Fazer login"}
+                            </Button>
+                        </div>
+                    : status === "taken" ?
+                        <div className="flex flex-col w-full gap-4">
+                            <div className="flex gap-2 items-center p-4 bg-orange-50 border-1 border-orange-200 rounded-3xl text-orange-700">
+                                <TriangleAlert size={18} className="shrink-0" />
+                                <span className="text-sm">{takenMessage}</span>
+                            </div>
+                            <Button variant="primary" type="button" onClick={() => navigate(loggedIn ? "/settings/profile" : "/")}>
+                                {loggedIn ? "Ir para o Perfil" : "Fazer login"}
+                            </Button>
+                        </div>
                     : status === "ok" ?
                         <div className="flex flex-col w-full gap-4">
                             <div className="flex items-center justify-center size-12 rounded-full bg-brand/10 text-brand">

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Camera, Images, Trash } from 'lucide-react';
+import { Camera, Images, MailWarning, Trash } from 'lucide-react';
 import { Avatar } from '../../components/Avatar';
 import { CameraModal } from '../../components/modals/CameraModal';
 import { Button } from '../../components/Button';
@@ -121,6 +121,57 @@ function PhotoCard(props: { user: User }) {
     );
 }
 
+// A new email waits for the link sent to it. Until then the account keeps the current email.
+function PendingEmailNotice(props: { pendingEmail: string }) {
+    const authContext = useAuth();
+    const { addToast } = useToast();
+    const [busy, setBusy] = useState<"resend" | "cancel" | null>(null);
+
+    async function resend() {
+        setBusy("resend");
+        try {
+            await authService.resendEmailChange();
+            addToast(`Link reenviado para ${props.pendingEmail}.`, "success");
+        } catch (error) {
+            addToast(getApiErrorMessage(error, "Não foi possível reenviar o e-mail."), "error");
+        } finally {
+            setBusy(null);
+        }
+    }
+
+    async function cancel() {
+        setBusy("cancel");
+        try {
+            await authService.cancelEmailChange();
+            await authContext.refreshUser();
+            addToast("Troca de e-mail cancelada.", "info");
+        } catch (error) {
+            addToast(getApiErrorMessage(error, "Não foi possível cancelar a troca."), "error");
+        } finally {
+            setBusy(null);
+        }
+    }
+
+    return (
+        <div className="flex flex-col gap-3 p-4 bg-orange-50 border-1 border-orange-200 rounded-3xl text-orange-700">
+            <div className="flex gap-2 items-start">
+                <MailWarning size={18} className="shrink-0 mt-0.5" />
+                <span className="text-sm">
+                    Aguardando confirmação de <strong className="break-all">{props.pendingEmail}</strong>. Abra o link que enviamos para esse endereço. Até lá, sua conta continua com o e-mail atual.
+                </span>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+                <Button variant="secondary" type="button" onClick={resend} disabled={busy !== null}>
+                    {busy === "resend" ? "Reenviando..." : "Reenviar e-mail"}
+                </Button>
+                <Button variant="secondary" type="button" onClick={cancel} disabled={busy !== null}>
+                    {busy === "cancel" ? "Cancelando..." : "Cancelar troca"}
+                </Button>
+            </div>
+        </div>
+    );
+}
+
 // Initial values come from props: this form is only rendered once the user is loaded.
 function PersonalInfoCard(props: { user: User }) {
     const authContext = useAuth();
@@ -142,10 +193,15 @@ function PersonalInfoCard(props: { user: User }) {
 
         setSaving(true);
         try {
-            await authService.updateProfile({ name: name.trim(), email: email.trim(), phone });
+            const { emailChangePending } = await authService.updateProfile({ name: name.trim(), email: email.trim(), phone });
             await authContext.refreshUser();
             queryClient.invalidateQueries({ queryKey: ['family'] });
-            addToast("Perfil atualizado!", "success");
+            addToast(
+                emailChangePending
+                    ? `Enviamos um link para ${email.trim()}. Seu e-mail muda quando você confirmar.`
+                    : "Perfil atualizado!",
+                "success"
+            );
         } catch (error) {
             addToast(getApiErrorMessage(error, "Não foi possível salvar o perfil."), "error");
         } finally {
@@ -160,6 +216,7 @@ function PersonalInfoCard(props: { user: User }) {
 
                 <Input type="text" label="Nome completo" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} />
                 <Input type="email" label="E-mail" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                {props.user.pendingEmail ? <PendingEmailNotice pendingEmail={props.user.pendingEmail} /> : null}
                 <Input
                     type="tel"
                     label="Telefone"
@@ -196,7 +253,8 @@ export default function ProfileTab() {
         <div className="flex flex-col gap-4">
             <PhotoCard user={user} />
             {/* key: reset the form when the saved profile changes */}
-            <PersonalInfoCard key={`${user.name}|${user.email}|${user.phone}`} user={user} />
+            {/* pendingEmail too: after asking for a new email, the field shows the current email again */}
+            <PersonalInfoCard key={`${user.name}|${user.email}|${user.phone}|${user.pendingEmail}`} user={user} />
             <BotsCard />
         </div>
     );

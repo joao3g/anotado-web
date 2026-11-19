@@ -26,8 +26,11 @@ export const getEmailNotVerified = (error: unknown) =>
         : null;
 
 // token: from the email link (#token=...). Fails with 400 when the link is invalid, used, or expired.
+// emailChanged: the link confirmed a new email from Perfil (not a sign-up). 409 when another account took it meanwhile.
 export const verifyEmail = async (token: string) => {
-    await api.post("/auth/verify-email", { token });
+    const { data } = await api.post<{ emailChanged?: boolean } | "">("/auth/verify-email", { token });
+
+    return { emailChanged: Boolean(data && data.emailChanged) };
 };
 
 // Same answer for any email. The API sends at most one email every 2 minutes.
@@ -41,8 +44,20 @@ export const getMe = async () => {
     return data;
 };
 
+// emailChangePending: the new email was not saved yet. It changes when the link sent to it is opened.
 export const updateProfile = async (profile: ProfileUpdate) => {
-    await api.patch("/auth/me", profile);
+    const { data } = await api.patch<{ emailChangePending?: boolean } | "">("/auth/me", profile);
+
+    return { emailChangePending: Boolean(data && data.emailChangePending) };
+};
+
+// Email change waiting for its link: send it again (429 within 2 minutes), or cancel it.
+export const resendEmailChange = async () => {
+    await api.post("/auth/me/email/resend");
+};
+
+export const cancelEmailChange = async () => {
+    await api.delete("/auth/me/email/pending");
 };
 
 // avatar: "data:image/jpeg;base64,..." already resized by the browser (see src/image.ts)
