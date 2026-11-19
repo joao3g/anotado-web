@@ -51,13 +51,16 @@ function Main() {
                         onKeyDown={(e) => e.key === "Enter" ? handleLogin() : null}
                     />
 
-                    <Input
-                        type="password"
-                        label="Senha"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" ? handleLogin() : null}
-                    />
+                    <div className="flex flex-col w-full gap-y-1">
+                        <Input
+                            type="password"
+                            label="Senha"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" ? handleLogin() : null}
+                        />
+                        <span className="self-end text-brand font-bold text-xs cursor-pointer" onClick={() => navigate("/forgot-password")}>Esqueceu a senha?</span>
+                    </div>
 
                     <div className="flex flex-row gap-x-3 flex-1 w-full">
                         <Button

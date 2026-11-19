@@ -8,6 +8,8 @@ import CardsPage from "./pages/Cards";
 import Dashboard from "./pages/Dashboard";
 import ComponentsPage from "./pages/Components";
 import RegisterPage from "./pages/Register";
+import ForgotPasswordPage from "./pages/ForgotPassword";
+import ResetPasswordPage from "./pages/ResetPassword";
 import OnboardingPage from "./pages/Onboarding";
 import SettingsPage from "./pages/settings/Settings";
 import ProfileTab from "./pages/settings/ProfileTab";
@@ -36,6 +38,18 @@ export const router = createBrowserRouter([
         loader: () => {
             if (localStorage.getItem("token")) throw redirect("/dashboard")
         },
+    },
+    {
+        path: "/forgot-password",
+        element: <ForgotPasswordPage />,
+        loader: () => {
+            if (localStorage.getItem("token")) throw redirect("/dashboard")
+        },
+    },
+    {
+        // Opened from the reset email. No redirect when logged in: the link may be opened on a logged-in phone.
+        path: "/reset-password",
+        element: <ResetPasswordPage />,
     },
     {
         // Logged in, but without a family yet

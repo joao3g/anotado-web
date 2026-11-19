@@ -36,3 +36,13 @@ export const removeAvatar = async () => {
 export const changePassword = async (currentPassword: string, newPassword: string) => {
     await api.patch("/auth/me/password", { currentPassword, newPassword });
 };
+
+// "Esqueceu a senha?": always succeeds when the email is valid, whether or not an account has it.
+export const forgotPassword = async (email: string) => {
+    await api.post("/auth/forgot-password", { email });
+};
+
+// token: from the email link (#token=...). Fails with 400 when the link is invalid, used, or expired.
+export const resetPassword = async (token: string, newPassword: string) => {
+    await api.post("/auth/reset-password", { token, newPassword });
+};
